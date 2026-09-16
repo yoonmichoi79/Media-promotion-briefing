@@ -25,7 +25,7 @@
   /* Subject line suggestion */
   .subject-box{
     background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;
-    padding:12px 16px;margin-bottom:12px;display:flex;align-items:left;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   }
   .subject-box .lbl{font-size:11px;color:var(--ink-faint);font-weight:700;letter-spacing:.03em;margin-bottom:3px;}
   .subject-box .txt{font-size:14px;font-weight:700;color:var(--ink);}
@@ -82,6 +82,7 @@
   .toast.show{opacity:1;}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-faint);text-align:center;}
 
+  #emailArea{max-width:680px;width:100%;margin:0 auto;}
   #emailArea.editing, #subjectText.editing{outline:2px dashed var(--signal);outline-offset:8px;border-radius:8px;}
   #emailArea.editing *[contenteditable]:focus,
   #emailArea.editing:focus, #subjectText.editing:focus{outline:none;}
@@ -98,15 +99,9 @@
   </div>
   <div class="toolbar-row">
     <button class="copy-btn" id="toggleEdit">✏️ 내용 수정</button>
-    <button class="copy-btn primary" id="copyHtmlSource">&lt;/&gt; HTML 소스 복사 (네이버웍스 에디터용)</button>
   </div>
 
   <div class="edit-hint" id="editHint">✏️ 수정 모드입니다 — 아래 텍스트를 클릭해서 자유롭게 고치실 수 있습니다. 끝나면 "수정 완료"를 눌러주세요.</div>
-  <div class="edit-hint show" style="background:var(--teal-soft);color:var(--teal);">
-    💡 <b>색상이 그대로 보이게 붙여넣는 방법</b>: 네이버웍스 메일 작성창에서 일반 붙여넣기(Ctrl+V)는 배경색이 지워질 수 있습니다.
-    대신 편집기 툴바의 <code>&lt;/&gt; 에디터</code> 버튼을 눌러 HTML 소스 입력 화면으로 전환한 뒤,
-    아래 "HTML 소스 복사" 버튼으로 복사한 코드를 그 안에 붙여넣고 다시 일반 화면으로 전환해 주세요.
-  </div>
 
   <div id="emailArea">
     <div class="headline">
@@ -310,7 +305,7 @@ function render(data){
     const ta = ma ? new Date(2026, ma.month-1, ma.day).getTime() : 0;
     const tb = mb ? new Date(2026, mb.month-1, mb.day).getTime() : 0;
     return tb - ta;
-  }).slice(0, 9);
+  }).slice(0, 12);
 
   // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 가까운 순
   const deadlineSoon = data
@@ -318,7 +313,7 @@ function render(data){
     .map(d=>({d, dday: ddayNum(d)}))
     .filter(x=>x.dday != null)
     .sort((a,b)=>a.dday-b.dday)
-    .slice(0, 9)
+    .slice(0, 12)
     .map(x=>x.d);
 
   LAST = {weekly, deadlineSoon, data};
@@ -431,123 +426,6 @@ document.getElementById('toggleEdit').addEventListener('click', ()=>{
   document.getElementById('editHint').classList.toggle('show', editMode);
   document.getElementById('toggleEdit').textContent = editMode ? '✅ 수정 완료' : '✏️ 내용 수정';
   toast(editMode ? '제목과 본문을 직접 클릭해서 수정하세요' : '수정이 잠겼습니다');
-});
-
-/* HTML 소스 복사용: 표+인라인 스타일로만 구성된 정적 HTML 문자열을 만듭니다.
-   이건 클립보드에 "리치 콘텐츠"로 넣는 게 아니라 "순수 텍스트(코드)"로 복사해서,
-   네이버웍스 등의 '</> 에디터(HTML 소스)' 입력창에 그대로 붙여넣기 위한 용도입니다. */
-const HTMLCOL = {
-  ink:'#161D2B', inkSoft:'#4B5468', inkFaint:'#8A93A6',
-  signal:'#D9542F', signalTint:'#FCE3D8', teal:'#0F6E63', tealTint:'#D8EFEA', gold:'#9C7A1E',
-};
-function htmlCard(d, kind){
-  const dday = ddayNum(d);
-  const accent = kind === 'deadline' ? HTMLCOL.signal : HTMLCOL.teal;
-  const bg = kind === 'deadline' ? HTMLCOL.signalTint : HTMLCOL.tealTint;
-  let badge = '';
-  if(kind === 'deadline' && dday != null){
-    badge = `<span style="display:inline-block;background-color:${HTMLCOL.signal};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${dday<=0?'D-DAY':'D-'+dday}</span>`;
-  } else if(kind === 'update' && d.tag){
-    const c = d.tag==='new' ? HTMLCOL.signal : HTMLCOL.gold;
-    badge = `<span style="display:inline-block;background-color:${c};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
-  }
-  const linkHtml = d.link ? `<a href="${escapeHtml(d.link)}" style="font-size:11px;font-weight:700;color:${HTMLCOL.teal};text-decoration:none;background-color:#ffffff;padding:3px 9px;border-radius:12px;">공지 보기</a>` : '';
-  const nb = 'border:none;border-collapse:collapse;';
-  return `
-  <td width="33%" valign="top" style="padding:6px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bg}" style="${nb}background-color:${bg};border-left:3px solid ${accent};border-radius:8px;">
-      <tr><td bgcolor="${bg}" style="${nb}background-color:${bg};padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
-          <td style="${nb}font-weight:700;font-size:13px;color:${HTMLCOL.ink};">${escapeHtml(d.media)}</td>
-          <td style="${nb}" align="right">${badge}</td>
-        </tr></table>
-        <div style="display:inline-block;font-size:10px;font-weight:700;color:${HTMLCOL.teal};background-color:#ffffff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;">${escapeHtml(d.type)}</div>
-        <div style="font-size:12px;color:${HTMLCOL.inkSoft};line-height:1.5;margin-bottom:10px;">${escapeHtml(d.promo)}</div>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
-          <td style="${nb}font-size:11px;color:${HTMLCOL.inkFaint};">${escapeHtml(periodText(d))}</td>
-          <td style="${nb}" align="right">${linkHtml}</td>
-        </tr></table>
-      </td></tr>
-    </table>
-  </td>`;
-}
-function htmlCardRows(cards, kind){
-  const rows = [];
-  for(let i=0;i<cards.length;i+=3){
-    const chunk = cards.slice(i,i+3);
-    const cells = chunk.map(d=>htmlCard(d,kind)).join('');
-    const filler = Array(3-chunk.length).fill('<td width="33%"></td>').join('');
-    rows.push(`<tr>${cells}${filler}</tr>`);
-  }
-  return rows.join('');
-}
-function buildHtmlSource(){
-  const {weekly, deadlineSoon, data} = LAST;
-  const subject = document.getElementById('subjectText').innerText.trim();
-  const todayStr = new Date().toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
-  const nb = 'border:none;border-collapse:collapse;';
-  const weeklyRows = weekly.length ? htmlCardRows(weekly,'update')
-    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${HTMLCOL.inkFaint};">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</td></tr>`;
-  const deadlineRows = deadlineSoon.length ? htmlCardRows(deadlineSoon,'deadline')
-    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${HTMLCOL.inkFaint};">종료일이 임박한 진행중 프로모션이 없습니다.</td></tr>`;
-
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}font-family:'Nanum Gothic',Arial,sans-serif;">
-<tr><td align="center">
-<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="${nb}max-width:640px;width:100%;">
-
-<tr><td style="border-bottom:2px solid ${HTMLCOL.ink};padding:0 4px 16px;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
-    <td style="${nb}font-size:12px;color:${HTMLCOL.inkFaint};">미디어전략실 · 위클리 브리핑</td>
-    <td style="${nb}font-size:12px;color:${HTMLCOL.inkFaint};" align="right">${todayStr}</td>
-  </tr></table>
-  <div style="font-size:24px;font-weight:800;color:${HTMLCOL.ink};margin:10px 0 8px;">이번 주, 지금 챙겨야 할 프로모션 한눈에</div>
-  <div style="font-size:13px;color:${HTMLCOL.inkSoft};">신규·변경 <b style="color:${HTMLCOL.signal};">${weekly.length}건</b>, 종료 임박 <b style="color:${HTMLCOL.signal};">${deadlineSoon.length}건</b>만 골라서 정리했습니다.</div>
-</td></tr>
-
-<tr><td style="height:22px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-
-<tr><td style="font-size:16px;font-weight:800;color:${HTMLCOL.ink};padding-bottom:4px;">🔥 이번주 프로모션 업데이트 <span style="font-size:12px;color:${HTMLCOL.inkFaint};font-weight:400;">(${weekly.length}건)</span></td></tr>
-<tr><td style="font-size:12px;color:${HTMLCOL.inkSoft};padding-bottom:10px;">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</td></tr>
-<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}">${weeklyRows}</table></td></tr>
-
-<tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-
-<tr><td style="font-size:16px;font-weight:800;color:${HTMLCOL.ink};padding-bottom:4px;">⏰ 종료일 임박 프로모션 <span style="font-size:12px;color:${HTMLCOL.inkFaint};font-weight:400;">(가까운 순 ${deadlineSoon.length}건)</span></td></tr>
-<tr><td style="font-size:12px;color:${HTMLCOL.inkSoft};padding-bottom:10px;">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</td></tr>
-<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}">${deadlineRows}</table></td></tr>
-
-<tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
-
-<tr><td>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${HTMLCOL.ink}" style="${nb}background-color:${HTMLCOL.ink};border-radius:10px;"><tr>
-    <td bgcolor="${HTMLCOL.ink}" style="${nb}background-color:${HTMLCOL.ink};padding:24px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
-        <td style="${nb}">
-          <div style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
-          <div style="font-size:12.5px;color:#C7CBD6;">전체 ${data.length}건을 필터·검색·정렬까지 한 화면에서 확인하세요.</div>
-        </td>
-        <td style="${nb}white-space:nowrap;" align="right" valign="middle">
-          <a href="${DASHBOARD_URL}" style="display:inline-block;background-color:#ffffff;color:${HTMLCOL.ink};font-weight:700;font-size:13px;text-decoration:none;padding:11px 20px;border-radius:20px;">대시보드 열기 →</a>
-        </td>
-      </tr></table>
-    </td></tr>
-  </table>
-</td></tr>
-
-</table>
-</td></tr>
-</table>`;
-}
-document.getElementById('copyHtmlSource').addEventListener('click', async ()=>{
-  if(!LAST.data.length){ toast('아직 데이터를 불러오는 중입니다'); return; }
-  const html = buildHtmlSource();
-  try{
-    await navigator.clipboard.writeText(html);
-    toast('HTML 코드가 복사되었습니다 — 메일 편집기의 "</> 에디터"(HTML 소스) 창에 붙여넣으세요');
-  }catch(e){
-    alert('클립보드 복사가 차단된 환경입니다. 개발자 도구 콘솔에서 코드를 확인해 주세요.');
-    console.log(html);
-  }
 });
 
 (async function init(){
