@@ -33,13 +33,11 @@
   .copy-btn:hover{background:var(--ink);color:#fff;}
   .copy-btn.primary{background:var(--ink);color:#fff;}
   .copy-btn.primary:hover{background:#2A3547;}
-  .toolbar-row{display:flex;justify-content:flex-end;gap:8px;margin-bottom:22px;}
 
   /* Headline */
-  .headline{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px;}
-  .headline .eyebrow{font-size:12px;color:var(--ink-faint);margin-bottom:10px;}
-  .headline h1{font-family:var(--serif);font-weight:800;font-size:clamp(26px,4vw,36px);margin:0 0 10px;letter-spacing:-.01em;line-height:1.3;}
-  .headline p{font-size:14px;color:var(--ink-soft);margin:0;}
+  .headline{margin-bottom:24px;}
+  .headline h1{font-family:var(--serif);font-weight:800;margin:0 0 8px;letter-spacing:-.01em;line-height:1.3;}
+  .headline p{font-size:13.5px;color:var(--ink-soft);margin:0;}
   .headline .stat-inline{display:inline-block;background:var(--signal-soft);color:var(--signal);font-weight:700;padding:1px 7px;border-radius:4px;margin:0 2px;}
 
   /* Sections */
@@ -83,41 +81,111 @@
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-faint);text-align:center;}
 
   #emailArea{max-width:680px;width:100%;margin:0 auto;}
-  #emailArea.editing, #subjectText.editing{outline:2px dashed var(--signal);outline-offset:8px;border-radius:8px;}
-  #emailArea.editing *[contenteditable]:focus,
-  #emailArea.editing:focus, #subjectText.editing:focus{outline:none;}
-  .edit-hint{display:none;font-size:11.5px;color:var(--signal);background:var(--signal-soft);padding:6px 12px;border-radius:8px;margin-bottom:16px;}
-  .edit-hint.show{display:block;}
+
+  /* Letterhead */
+  .disclaimer{font-size:12px;color:var(--ink-faint);font-style:italic;margin-bottom:18px;}
+  .notice-word{font-family:Arial,'Nanum Gothic',sans-serif;font-weight:900;font-size:34px;font-style:italic;color:#E8412E;letter-spacing:-.02em;margin-bottom:22px;}
+  .lh-title{font-size:19px;font-weight:800;color:var(--ink);}
+  .lh-brand{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.03em;}
+  .lh-divider{border:none;border-top:2px solid #E8412E;margin:8px 0 20px;}
+  .lh-link-line{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:14px;}
+  .lh-link-line a{color:#1a56db;text-decoration:underline;font-weight:800;}
+  .lh-body{font-size:13.5px;color:var(--ink-soft);line-height:1.8;margin-bottom:26px;}
+  .lh-body .fine{font-size:12px;color:var(--ink-faint);}
+  .lh-closing{font-size:13.5px;color:var(--ink-soft);line-height:1.9;margin:30px 0 18px;}
+  .lh-closing b{color:var(--ink);}
+  .lh-highlight{background:#FFF3B0;font-weight:700;padding:0 2px;}
+  .sig-box{background:#F5F5F3;border-radius:8px;padding:18px 20px;margin-bottom:24px;}
+  .sig-name{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .sig-dept{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+  .sig-contact{font-size:12px;color:var(--ink-soft);}
+  .sig-contact span{margin-right:16px;white-space:nowrap;}
+  .playd-footer{border-top:3px solid var(--ink);padding-top:16px;}
+  .playd-footer .word{font-size:18px;font-weight:900;color:var(--ink);letter-spacing:.02em;}
+  .playd-footer .tag{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+  .footer-btn{display:inline-block;font-size:11.5px;font-weight:700;text-decoration:none;color:#fff;padding:7px 14px;border-radius:16px;white-space:nowrap;}
+  .footer-btn.red{background:#E8412E;}
+  .footer-btn.dark{background:var(--ink);}
+  .footer-label{font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="subject-box">
-    <div><div class="lbl">📬 추천 메일 제목</div><div class="txt" id="subjectText">[미디어전략실] 이번 주 프로모션 업데이트 &amp; 종료임박 리스트</div></div>
+    <div><div class="lbl">📬 추천 메일 제목</div><div class="txt" id="subjectText">[매체프로모션/공유] 최신 업데이트 &amp; 종료임박 리스트_9/16</div></div>
     <button class="copy-btn" id="copySubject">제목 복사</button>
   </div>
-  <div class="toolbar-row">
-    <button class="copy-btn" id="toggleEdit">✏️ 내용 수정</button>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+    <button class="copy-btn primary" id="selectAllBtn">본문 전체 선택</button>
   </div>
 
-  <div class="edit-hint" id="editHint">✏️ 수정 모드입니다 — 아래 텍스트를 클릭해서 자유롭게 고치실 수 있습니다. 끝나면 "수정 완료"를 눌러주세요.</div>
-
   <div id="emailArea">
+    <div class="disclaimer">※ 본 리스트는 미디어전략팀 및 데이터전략팀에서 수신한 메일 등을 통해 확인된 매체 프로모션 내역입니다.</div>
+
+    <div class="notice-word">notice</div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;margin-bottom:0;"><tr>
+      <td style="border:none;"><span class="lh-title">미디어전략팀에서 안내드립니다.</span></td>
+      <td style="border:none;" align="right"><span class="lh-brand">PLAY.D</span></td>
+    </tr></table>
+    <hr class="lh-divider">
+
+    <div class="lh-link-line">* <span id="quarterLabel">2026년 3분기</span> 전체 프로모션 현황 <a href="" id="dashboardLinkTop" target="_blank" rel="noopener">바로가기</a></div>
+
+    <div class="lh-body">
+      플레이디 주요 매체 및 버티컬 매체의 프로모션을 컨플루언스 게시판을 통해 상시 업데이트하고 있습니다.<br>
+      별도 컨택 등을 통해 확인하신 프로모션 중 게시판에 반영되지 않은 내용이 있다면 미디어전략실 매체담당부서(미전팀 or 데이터팀)로 공유 부탁드립니다.<br><br>
+      <span class="fine">※ 프로모션 현황은 수시 업데이트되므로, 메일 본문 내 목록과 컨플루언스 게시판의 내용이 일부 상이할 수 있습니다.</span>
+    </div>
+
     <div class="headline">
-      <div class="eyebrow"><span>미디어전략실 · 위클리 브리핑</span> · <span id="dateLabel"></span></div>
-      <h1 id="mainHeadline">불러오는 중…</h1>
+      <h1 id="mainHeadline" style="font-size:22px;">불러오는 중…</h1>
       <p id="subHeadline"></p>
     </div>
 
     <div id="content">
       <div class="status-line">구글시트에서 최신 데이터를 불러오는 중입니다…</div>
     </div>
+
+    <div class="lh-closing">
+      감사합니다.<br><br>
+      <b>최윤미 드림.</b><br>
+      ※ 업무 지연 및 누락 방지를 위해 <span class="lh-highlight">미디어전략팀 &lt;playd.media@playd.com&gt;</span> 필수 참조 부탁드립니다.
+    </div>
+
+    <div class="sig-box">
+      <div class="sig-name">최 윤 미 파트장</div>
+      <div class="sig-dept">성장전략본부 미디어전략실 미디어전략팀</div>
+      <div class="sig-contact">
+        <span>📱 010.4919.4193</span><span>☎ 031.696.7070</span><span>✉ threepio@playd.com</span><span>📠 031.707.7560</span>
+      </div>
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="playd-footer" style="border-collapse:collapse;"><tr>
+      <td style="border:none;padding:0;" valign="top">
+        <div class="word">PLAY.D</div>
+        <div class="tag">성과를 넘어, 성장을 설계하는 AI 마케팅 파트너 <a href="https://www.playd.com" style="color:var(--ink-faint);">www.playd.com</a></div>
+      </td>
+      <td style="border:none;padding:0 0 0 12px;" align="right" valign="top">
+        <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>
+          <td style="border:none;padding-right:10px;text-align:right;">
+            <div class="footer-label">하루 5분 트렌드 한 접시</div>
+            <a href="#" class="footer-btn red">P'letter 구독 신청</a>
+          </td>
+          <td style="border:none;text-align:right;">
+            <div class="footer-label">광고주 성공사례 한 눈에</div>
+            <a href="#" class="footer-btn dark">포트폴리오 바로가기</a>
+          </td>
+        </tr></table>
+      </td>
+    </tr></table>
   </div>
 
   <div class="toast" id="toast"></div>
 
 </div>
+
 
 
 <script>
@@ -318,7 +386,9 @@ function render(data){
 
   LAST = {weekly, deadlineSoon, data};
 
-  document.getElementById('dateLabel').textContent = today.toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+  const mm = today.getMonth()+1, dd = today.getDate();
+  document.getElementById('subjectText').textContent = `[매체프로모션/공유] 최신 업데이트 & 종료임박 리스트_${mm}/${dd}`;
+  document.getElementById('dashboardLinkTop').href = DASHBOARD_URL;
   document.getElementById('mainHeadline').textContent = `이번 주, 지금 챙겨야 할 프로모션 한눈에`;
   document.getElementById('subHeadline').innerHTML =
     `신규·변경 <span class="stat-inline">${weekly.length}건</span>, 종료 임박 <span class="stat-inline">${deadlineSoon.length}건</span>만 골라서 정리했습니다. 전체 목록은 아래 대시보드에서 확인하세요.`;
@@ -413,19 +483,17 @@ document.getElementById('copySubject').addEventListener('click', async ()=>{
   }catch(e){ alert(text); }
 });
 
-/* 수정 모드: 켜면 추천 메일 제목과 본문 내용을 모두 직접 클릭해서 고칠 수 있습니다 */
-let editMode = false;
-document.getElementById('toggleEdit').addEventListener('click', ()=>{
-  editMode = !editMode;
+/* 사람이 직접 드래그하면 맨 위/아래를 놓치기 쉬우므로, 본문 전체(레터헤드~푸터)를
+   정확한 범위로 대신 선택해줍니다. 실제 복사는 브라우저 기본 동작인 Ctrl+C로
+   사람이 직접 실행해야, 스크립트로 강제 복사할 때보다 서식(배경색 등)이 훨씬 안전하게 유지됩니다. */
+document.getElementById('selectAllBtn').addEventListener('click', ()=>{
   const area = document.getElementById('emailArea');
-  const subject = document.getElementById('subjectText');
-  area.contentEditable = editMode ? 'true' : 'false';
-  subject.contentEditable = editMode ? 'true' : 'false';
-  area.classList.toggle('editing', editMode);
-  subject.classList.toggle('editing', editMode);
-  document.getElementById('editHint').classList.toggle('show', editMode);
-  document.getElementById('toggleEdit').textContent = editMode ? '✅ 수정 완료' : '✏️ 내용 수정';
-  toast(editMode ? '제목과 본문을 직접 클릭해서 수정하세요' : '수정이 잠겼습니다');
+  const range = document.createRange();
+  range.selectNodeContents(area);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  toast('본문 전체가 선택되었습니다 — Ctrl+C(맥은 Cmd+C)로 복사한 뒤 메일에 붙여넣으세요');
 });
 
 (async function init(){
