@@ -64,7 +64,7 @@
 
   /* Priority strip */
   .priority{margin-bottom:40px;}
-  .priority h2{font-family:var(--serif);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 14px;}
+  .priority h2{font-family:var(--serif);font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 14px;}
   .priority h2::before{content:"";width:7px;height:7px;background:var(--signal);border-radius:50%;display:inline-block;}
   .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
   .pcard{flex:0 0 260px;background:var(--signal-soft);border:1px solid #F0CFC2;padding:14px 16px;border-radius:6px;}
@@ -91,7 +91,7 @@
   .count-line{font-size:12px;color:var(--ink-faint);margin:14px 2px 10px;}
 
   /* Table */
-  .group-title{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink-soft);padding:16px 4px 6px;letter-spacing:.02em;}
+  .group-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink-soft);padding:16px 4px 6px;letter-spacing:.02em;}
   table{width:100%;border-collapse:collapse;background:#FAFBFA;border:1px solid var(--line-soft);}
   thead th{text-align:left;font-size:11.5px;color:var(--ink-faint);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--ink);letter-spacing:.02em;}
   tbody tr{border-bottom:1px solid var(--line-soft);}
@@ -100,7 +100,7 @@
   tbody td{padding:11px 12px;font-size:13.5px;vertical-align:top;}
   td.col-media{width:118px;font-weight:700;white-space:nowrap;}
   td.col-tag{width:104px;}
-  td.col-promo{color:var(--ink);}
+  td.col-promo{color:var(--ink);font-size:14px;}
   td.col-period{width:150px;color:var(--ink-soft);font-size:12.5px;}
   td.col-period .deadline-line{color:var(--signal);font-size:11px;margin-top:3px;font-weight:600;}
   td.col-status{width:88px;}
@@ -114,6 +114,7 @@
   .flag.update{background:var(--gold-soft);color:var(--gold);}
   .dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--purple-soft);color:var(--purple);}
   .badge{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:11px;font-weight:600;}
+  td.col-tag .badge{font-size:10.5px;}
   .empty{padding:40px 10px;text-align:center;color:var(--ink-faint);font-size:13px;}
 
   /* Settings drawer */
@@ -160,14 +161,13 @@
         <span>미디어전략실 · 사내 공유</span>
         <span id="quarterLabel">업데이트 2026.09</span>
       </div>
-      <h1>미디어 프로모션 브리핑</h1>
-      <p class="sub">2026년 3분기 · 빅테크 및 버티컬 매체 프로모션 현황입니다. 진행중/종료 탭으로 먼저 구분해서 보고, 종료 임박순으로 우선순위를 확인하세요.</p>
-      <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며, 목록에 없는 프로모션을 알고 계시면 미디어전략팀으로 공유 부탁드립니다.</p>
+      <h1>플레이디 주요 매체 프로모션 현황</h1>
+      <p class="sub">2026년 3분기 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>진행중/종료 탭으로 먼저 구분해서 보고, 종료 임박순으로 우선순위를 확인하세요.</p>
+      <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며,<br>목록에 없는 프로모션을 알고 계시면 미디어전략실(데전팀 or 미전팀)으로 공유 부탁드립니다.</p>
     </div>
     <div class="source-panel">
       <div class="row1">
         <span class="src-label"><span class="dot off" id="srcDot"></span><span id="srcLabel">기본 데이터 사용 중</span></span>
-        <button class="btn ghost" id="openSettings" style="padding:4px 9px;">⚙ 연동</button>
       </div>
       <div class="meta" id="srcMeta">구글시트를 연결하면 이 페이지가 시트 변경 내용을 그대로 불러옵니다.</div>
       <div class="btnrow"><button class="btn ghost" id="refreshBtn" style="display:none;">새로고침</button></div>
@@ -209,11 +209,11 @@
   <div id="results"></div>
 
   <div class="contact-box">
-    <b>버티컬 매체 프로모션 신청/부킹 문의</b><br>
+    <b>미디어 프로모션 신청/문의</b><br>
     매체 담당자에게 직접 문의하며, 메일 발송 시 담당 팀을 필수 참조해 주세요.<br>
-    국내 버티컬 — 미디어전략팀 <a href="mailto:playd.media@playd.com">playd.media@playd.com</a><br>
-    해외 버티컬 — 데이터전략팀 <a href="mailto:global_media@playd.com">global_media@playd.com</a><br>
-    프로모션 상세 내용은 각 매체(네이버/카카오/구글/메타/버티컬) Worki 공지사항을 통해 항시 확인할 수 있습니다.
+    국내 버티컬 — 미디어전략팀 playd.media@playd.com<br>
+    해외 버티컬 — 데이터전략팀 global_media@playd.com<br>
+    프로모션 상세 내용은 각 매체(네이버/카카오/구글/메타/버티컬) <a href="https://worki.playd.com/" target="_blank" rel="noopener">Worki 공지사항</a>을 통해 항시 확인할 수 있습니다.
   </div>
 
   <footer>플레이디 미디어전략실 · 종료가 임박한 건은 상단 정렬을 "종료 임박순"으로 바꿔 우선 확인해 주세요. 상태(진행중/진행예정/종료)는 시작일·종료일 기준으로 자동 보정되어 표시됩니다.</footer>
@@ -593,17 +593,6 @@ function renderResults(){
 
   const tableHead = `<thead><tr><th>매체</th><th>구분</th><th>프로모션 내용</th><th>기간</th><th>상태</th><th>공지</th></tr></thead>`;
 
-  if(state.sort === 'deadline'){
-    const rows = filtered.slice().sort((a,b)=>sortKey(a)-sortKey(b));
-    container.innerHTML = `<div class="group"><table>${tableHead}<tbody>${rows.map(rowHtml).join('')}</tbody></table></div>`;
-    return;
-  }
-  if(state.sort === 'updated'){
-    const rows = filtered.slice().sort((a,b)=>updatedKey(a)-updatedKey(b));
-    container.innerHTML = `<div class="group"><table>${tableHead}<tbody>${rows.map(rowHtml).join('')}</tbody></table></div>`;
-    return;
-  }
-
   const segLabel = {bigtech:'빅테크 매체', vertical:'버티컬 매체'};
   const audLabel = {adv:'광고주 대상', agency:'에이전시 대상'};
   const segOrder = state.seg==='all' ? ['bigtech','vertical'] : [state.seg];
@@ -611,7 +600,12 @@ function renderResults(){
   segOrder.forEach(seg=>{
     const audOrder = state.aud==='all' ? ['adv','agency'] : [state.aud];
     audOrder.forEach(aud=>{
-      const rows = filtered.filter(d=>d.seg===seg && d.aud===aud);
+      let rows = filtered.filter(d=>d.seg===seg && d.aud===aud);
+      if(state.sort === 'deadline'){
+        rows = rows.slice().sort((a,b)=>sortKey(a)-sortKey(b));
+      } else if(state.sort === 'updated'){
+        rows = rows.slice().sort((a,b)=>updatedKey(a)-updatedKey(b));
+      }
       if(rows.length) groups.push({title:`${segLabel[seg]} · ${audLabel[aud]}`, rows});
     });
   });
@@ -645,7 +639,6 @@ const overlay = document.getElementById('overlay');
 const drawer = document.getElementById('drawer');
 function openDrawer(){ overlay.classList.add('open'); drawer.classList.add('open'); }
 function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
-document.getElementById('openSettings').addEventListener('click', openDrawer);
 document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 
@@ -881,7 +874,7 @@ async function fetchSheetViaApi(rawUrl, apiKey, silent){
     renderStats(); renderPriority(); renderAll();
     return true;
   }catch(err){
-    setSourceUI('error', `API 연동 실패 · ⚙ 연동에서 자세히 확인`);
+    setSourceUI('error', `API 연동 실패 · 새로고침을 눌러 다시 시도해 주세요`);
     statusEl.innerHTML = `<div class="statusmsg err">API 연동 실패: ${escapeHtml(err.message)}<br>API 키가 올바른지, "Google Sheets API"가 사용 설정되어 있는지, 시트가 "링크가 있으면 볼 수 있음"으로 공유되어 있는지 확인해 주세요.</div>`;
     return false;
   }
@@ -945,7 +938,7 @@ async function fetchSheet(url, silent){
     }
   }
   const detail = tried.join(' / ');
-  setSourceUI('error', `연동 실패 · ⚙ 연동에서 자세히 확인`);
+  setSourceUI('error', `연동 실패 · 새로고침을 눌러 다시 시도해 주세요`);
   statusEl.innerHTML = `<div class="statusmsg err">불러오기 실패 — 직접 연결과 프록시 경유 3곳을 모두 시도했지만 안 됐습니다.<br><span style="font-size:11px;">${escapeHtml(detail)}</span><br>잠시 후 새로고침을 다시 눌러보시거나, 시트가 "웹에 게시" 상태로 공개되어 있는지 확인해 주세요.</div>`;
   return false;
 }
