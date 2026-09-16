@@ -20,7 +20,7 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:transparent;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;}
-  .wrap{max-width:1020px;margin:0 auto;padding:36px 24px 70px;background:transparent;}
+  .wrap{max-width:680px;margin:0 auto;padding:36px 24px 70px;background:transparent;}
 
   /* Subject line suggestion */
   .subject-box{
@@ -282,21 +282,15 @@ let LAST = {weekly:[], deadlineSoon:[], data:[]};
 
 function render(data){
   const today = new Date(); today.setHours(0,0,0,0);
-  const weekAgo = new Date(today.getTime() - 7*86400000);
 
-  // 1) 이번주 업데이트: 업데이트일이 최근 7일 이내 이거나 NEW/UPDATE 플래그가 있는 항목
-  const weekly = data.filter(d=>{
-    if(d.tag === 'new' || d.tag === 'update') return true;
-    const md = parseMD(d.updated);
-    if(!md) return false;
-    const dt = new Date(2026, md.month-1, md.day);
-    return dt >= weekAgo && dt <= today;
-  }).sort((a,b)=>{
+  // 1) 이번주 업데이트: NEW 또는 UPDATE로 표시된 항목만, 개수 제한 없이 모두 표시
+  const weekly = data.filter(d => d.tag === 'new' || d.tag === 'update')
+  .sort((a,b)=>{
     const ma = parseMD(a.updated), mb = parseMD(b.updated);
     const ta = ma ? new Date(2026, ma.month-1, ma.day).getTime() : 0;
     const tb = mb ? new Date(2026, mb.month-1, mb.day).getTime() : 0;
     return tb - ta;
-  }).slice(0, 12);
+  });
 
   // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 가까운 순
   const deadlineSoon = data
@@ -327,7 +321,7 @@ function render(data){
   document.getElementById('content').innerHTML = `
     <div class="section">
       <div class="section-head"><h2>🔥 이번주 프로모션 업데이트 (${weekly.length}건)</h2></div>
-      <div class="section-sub">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</div>
+      <div class="section-sub">NEW 또는 UPDATE로 표시된 프로모션만 모았습니다.</div>
       ${weeklySection}
     </div>
 
