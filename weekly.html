@@ -5,46 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>미디어 프로모션 위클리 브리핑</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,600;0,700;1,600&display=swap');
   :root{
-    --paper:#F4F5F2; --paper-raised:#FFFFFF;
     --ink:#161D2B; --ink-soft:#4B5468; --ink-faint:#8A93A6;
     --line:#DEE1DA; --line-soft:#EAEBE6;
-    --signal:#D9542F; --signal-soft:#FBEAE3;
-    --teal:#0F6E63; --teal-soft:#E1F0EC;
-    --gold:#9C7A1E; --gold-soft:#F5EDD9;
-    --green:#2F7D4E; --green-soft:#E4F0E7;
-    --serif:'Source Serif 4','Noto Serif KR',Georgia,serif;
-    --sans:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    --signal:#D9542F; --signal-soft:#FDEDE6; --signal-tint:#FCE3D8;
+    --teal:#0F6E63; --teal-soft:#E4F3F0; --teal-tint:#D8EFEA;
+    --gold:#9C7A1E; --gold-soft:#F8F0DA;
+    --green:#2F7D4E; --green-soft:#E9F5EC;
+    --serif:'Nanum Gothic',sans-serif;
+    --sans:'Nanum Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5;}
-  .wrap{max-width:1020px;margin:0 auto;padding:36px 24px 70px;}
+  body{background:transparent;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;}
+  .wrap{max-width:1020px;margin:0 auto;padding:36px 24px 70px;background:transparent;}
 
   /* Subject line suggestion */
   .subject-box{
-    background:#fff;border:1px dashed var(--line);border-radius:10px;
-    padding:12px 16px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;
+    padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   }
   .subject-box .lbl{font-size:11px;color:var(--ink-faint);font-weight:700;letter-spacing:.03em;margin-bottom:3px;}
   .subject-box .txt{font-size:14px;font-weight:700;color:var(--ink);}
   .copy-btn{font-family:var(--sans);font-size:12px;padding:6px 12px;border-radius:16px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap;}
   .copy-btn:hover{background:var(--ink);color:#fff;}
+  .copy-btn.primary{background:var(--ink);color:#fff;}
+  .copy-btn.primary:hover{background:#2A3547;}
+  .toolbar-row{display:flex;justify-content:flex-end;margin-bottom:22px;}
 
   /* Headline */
   .headline{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px;}
   .headline .eyebrow{font-size:12px;color:var(--ink-faint);margin-bottom:10px;display:flex;justify-content:space-between;}
-  .headline h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0 0 10px;letter-spacing:-.01em;line-height:1.3;}
+  .headline h1{font-family:var(--serif);font-weight:800;font-size:clamp(26px,4vw,36px);margin:0 0 10px;letter-spacing:-.01em;line-height:1.3;}
   .headline p{font-size:14px;color:var(--ink-soft);margin:0;}
   .headline .stat-inline{display:inline-block;background:var(--signal-soft);color:var(--signal);font-weight:700;padding:1px 7px;border-radius:4px;margin:0 2px;}
 
   /* Sections */
   .section{margin-bottom:40px;}
   .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:6px;}
-  .section-head h2{font-family:var(--serif);font-size:19px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px;}
+  .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;}
   .section-head .count{font-size:12.5px;color:var(--ink-faint);font-weight:500;}
   .section-sub{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 16px;}
 
@@ -53,26 +54,26 @@
   @media(max-width:520px){ .grid{grid-template-columns:1fr;} }
 
   .card{
-    background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;
-    padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.03);
+    border:1px solid transparent;border-radius:10px;
+    padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
     display:flex;flex-direction:column;min-height:150px;
   }
-  .card.deadline-card{border-left:3px solid var(--signal);}
-  .card.update-card{border-left:3px solid var(--teal);}
+  .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
+  .card.update-card{background:var(--teal-tint);border-left:3px solid var(--teal);}
   .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px;}
   .card-media{font-weight:700;font-size:13.5px;color:var(--ink);}
   .badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;}
-  .badge.new{background:var(--signal-soft);color:var(--signal);}
-  .badge.upd{background:var(--gold-soft);color:var(--gold);}
+  .badge.new{background:var(--signal);color:#fff;}
+  .badge.upd{background:var(--gold);color:#fff;}
   .badge.dday{background:var(--signal);color:#fff;}
-  .card-type{display:inline-block;font-size:10.5px;font-weight:600;color:var(--teal);background:var(--teal-soft);padding:2px 7px;border-radius:9px;margin-bottom:7px;align-self:flex-start;}
+  .card-type{display:inline-block;font-size:10.5px;font-weight:600;color:var(--teal);background:#fff;padding:2px 7px;border-radius:9px;margin-bottom:7px;align-self:flex-start;}
   .card-promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;}
   .card-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
   .card-period{font-size:11px;color:var(--ink-faint);}
-  .card-link{font-size:11.5px;font-weight:700;color:var(--teal);text-decoration:none;background:var(--teal-soft);padding:3px 9px;border-radius:12px;}
+  .card-link{font-size:11.5px;font-weight:700;color:var(--teal);text-decoration:none;background:#fff;padding:3px 9px;border-radius:12px;}
   .card-link:hover{background:var(--teal);color:#fff;}
 
-  .empty-note{font-size:12.5px;color:var(--ink-faint);padding:20px 4px;background:var(--paper-raised);border:1px dashed var(--line);border-radius:10px;text-align:center;}
+  .empty-note{font-size:12.5px;color:var(--ink-faint);padding:20px 4px;background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;text-align:center;}
 
   /* CTA */
   .cta{
@@ -85,9 +86,11 @@
     background:#fff;color:var(--ink);font-weight:700;font-size:14px;text-decoration:none;
     padding:12px 22px;border-radius:24px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15);
   }
-  .cta-btn:hover{background:var(--paper);}
+  .cta-btn:hover{background:#F4F5F2;}
 
   .status-line{font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0;}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;padding:10px 18px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:99;}
+  .toast.show{opacity:1;}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-faint);text-align:center;}
 </style>
 </head>
@@ -97,6 +100,9 @@
   <div class="subject-box">
     <div><div class="lbl">📬 추천 메일 제목</div><div class="txt" id="subjectText">[미디어전략실] 이번 주 프로모션 업데이트 &amp; 종료임박 리스트</div></div>
     <button class="copy-btn" id="copySubject">제목 복사</button>
+  </div>
+  <div class="toolbar-row">
+    <button class="copy-btn primary" id="copyBody">📋 본문 복사 (메일 붙여넣기용)</button>
   </div>
 
   <div class="headline">
@@ -108,6 +114,8 @@
   <div id="content">
     <div class="status-line">구글시트에서 최신 데이터를 불러오는 중입니다…</div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
 </div>
 
@@ -277,6 +285,8 @@ function cardHtml(d, kind){
     </div>`;
 }
 
+let LAST = {weekly:[], deadlineSoon:[], data:[]};
+
 function render(data){
   const today = new Date(); today.setHours(0,0,0,0);
   const weekAgo = new Date(today.getTime() - 7*86400000);
@@ -301,8 +311,10 @@ function render(data){
     .map(d=>({d, dday: ddayNum(d)}))
     .filter(x=>x.dday != null)
     .sort((a,b)=>a.dday-b.dday)
-    .slice(0, 6)
+    .slice(0, 9)
     .map(x=>x.d);
+
+  LAST = {weekly, deadlineSoon, data};
 
   document.getElementById('dateLabel').textContent = today.toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
   document.getElementById('mainHeadline').textContent = `이번 주, 지금 챙겨야 할 프로모션 한눈에`;
@@ -319,7 +331,7 @@ function render(data){
 
   document.getElementById('content').innerHTML = `
     <div class="section">
-      <div class="section-head"><h2>🆕 이번주 프로모션 업데이트</h2><span class="count">${weekly.length}건</span></div>
+      <div class="section-head"><h2>🔥 이번주 프로모션 업데이트</h2><span class="count">${weekly.length}건</span></div>
       <div class="section-sub">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</div>
       ${weeklySection}
     </div>
@@ -342,14 +354,150 @@ function render(data){
   `;
 }
 
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1800);
+}
+
+/* ---- 메일 붙여넣기용: 표(table) 기반 + 인라인 스타일로만 구성된 정적 HTML ---- */
+const EM = {
+  ink:'#161D2B', inkSoft:'#4B5468', inkFaint:'#8A93A6', line:'#DEE1DA',
+  signal:'#D9542F', signalTint:'#FCE3D8', teal:'#0F6E63', tealTint:'#D8EFEA', gold:'#9C7A1E',
+};
+function emChunk(arr, size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+function emCard(d, kind){
+  const dday = ddayNum(d);
+  const accent = kind === 'deadline' ? EM.signal : EM.teal;
+  const bg = kind === 'deadline' ? EM.signalTint : EM.tealTint;
+  let badge = '';
+  if(kind === 'deadline' && dday != null){
+    badge = `<span style="display:inline-block;background:${EM.signal};color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${dday<=0?'D-DAY':'D-'+dday}</span>`;
+  } else if(kind === 'update' && d.tag){
+    const c = d.tag==='new' ? EM.signal : EM.gold;
+    badge = `<span style="display:inline-block;background:${c};color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
+  }
+  const linkHtml = d.link ? `<a href="${escapeHtml(d.link)}" style="font-size:11px;font-weight:700;color:${EM.teal};text-decoration:none;background:#fff;padding:3px 9px;border-radius:12px;">공지 보기</a>` : '';
+  return `
+  <td width="33%" style="padding:6px;vertical-align:top;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${bg};border-left:3px solid ${accent};border-radius:8px;">
+      <tr><td style="padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="font-weight:700;font-size:13px;color:${EM.ink};">${escapeHtml(d.media)}</td>
+          <td align="right">${badge}</td>
+        </tr></table>
+        <div style="display:inline-block;font-size:10px;font-weight:700;color:${EM.teal};background:#fff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;">${escapeHtml(d.type)}</div>
+        <div style="font-size:12px;color:${EM.inkSoft};line-height:1.5;margin:0 0 10px;">${escapeHtml(d.promo)}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="font-size:11px;color:${EM.inkFaint};">${escapeHtml(periodText(d))}</td>
+          <td align="right">${linkHtml}</td>
+        </tr></table>
+      </td></tr>
+    </table>
+  </td>`;
+}
+function emCardRow(cards, kind){
+  return emChunk(cards, 3).map(row=>{
+    const cells = row.map(d=>emCard(d, kind)).join('');
+    const pad = 3 - row.length;
+    const filler = Array(pad).fill('<td width="33%"></td>').join('');
+    return `<tr>${cells}${filler}</tr>`;
+  }).join('');
+}
+function buildEmailHtml(){
+  const {weekly, deadlineSoon, data} = LAST;
+  const todayStr = new Date().toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+  const weeklyRows = weekly.length ? emCardRow(weekly, 'update')
+    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${EM.inkFaint};font-family:'Nanum Gothic',Arial,sans-serif;">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</td></tr>`;
+  const deadlineRows = deadlineSoon.length ? emCardRow(deadlineSoon, 'deadline')
+    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${EM.inkFaint};font-family:'Nanum Gothic',Arial,sans-serif;">종료일이 임박한 진행중 프로모션이 없습니다.</td></tr>`;
+
+  return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:transparent;font-family:'Nanum Gothic',Arial,sans-serif;">
+<tr><td align="center">
+<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
+
+  <tr><td style="border-bottom:2px solid ${EM.ink};padding:0 4px 16px;">
+    <table role="presentation" width="100%"><tr>
+      <td style="font-size:12px;color:${EM.inkFaint};">미디어전략실 · 위클리 브리핑</td>
+      <td align="right" style="font-size:12px;color:${EM.inkFaint};">${todayStr}</td>
+    </tr></table>
+    <div style="font-size:24px;font-weight:800;color:${EM.ink};margin:10px 0 8px;">이번 주, 지금 챙겨야 할 프로모션 한눈에</div>
+    <div style="font-size:13px;color:${EM.inkSoft};">신규·변경 <b style="color:${EM.signal};">${weekly.length}건</b>, 종료 임박 <b style="color:${EM.signal};">${deadlineSoon.length}건</b>만 골라서 정리했습니다.</div>
+  </td></tr>
+
+  <tr><td style="height:22px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+  <tr><td style="font-size:16px;font-weight:800;color:${EM.ink};padding-bottom:4px;">🔥 이번주 프로모션 업데이트 <span style="font-size:12px;color:${EM.inkFaint};font-weight:400;">(${weekly.length}건)</span></td></tr>
+  <tr><td style="font-size:12px;color:${EM.inkSoft};padding-bottom:10px;">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</td></tr>
+  <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${weeklyRows}</table></td></tr>
+
+  <tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+  <tr><td style="font-size:16px;font-weight:800;color:${EM.ink};padding-bottom:4px;">⏰ 종료일 임박 프로모션 <span style="font-size:12px;color:${EM.inkFaint};font-weight:400;">(가까운 순 ${deadlineSoon.length}건)</span></td></tr>
+  <tr><td style="font-size:12px;color:${EM.inkSoft};padding-bottom:10px;">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</td></tr>
+  <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${deadlineRows}</table></td></tr>
+
+  <tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+  <tr><td>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${EM.ink};border-radius:10px;">
+      <tr><td style="padding:24px;">
+        <table role="presentation" width="100%"><tr>
+          <td style="font-family:'Nanum Gothic',Arial,sans-serif;">
+            <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
+            <div style="font-size:12.5px;color:#C7CBD6;">전체 ${data.length}건을 필터·검색·정렬까지 한 화면에서 확인하세요.</div>
+          </td>
+          <td align="right" valign="middle">
+            <a href="${DASHBOARD_URL}" style="display:inline-block;background:#fff;color:${EM.ink};font-weight:700;font-size:13px;text-decoration:none;padding:11px 20px;border-radius:20px;font-family:'Nanum Gothic',Arial,sans-serif;">대시보드 열기 →</a>
+          </td>
+        </tr></table>
+      </td></tr>
+    </table>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>`;
+}
+function buildPlainText(){
+  const {weekly, deadlineSoon, data} = LAST;
+  const lines = ['이번 주, 지금 챙겨야 할 프로모션 한눈에', '', `[이번주 업데이트 ${weekly.length}건]`];
+  weekly.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
+  lines.push('', `[종료 임박 ${deadlineSoon.length}건]`);
+  deadlineSoon.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
+  lines.push('', `전체 대시보드: ${DASHBOARD_URL}`);
+  return lines.join('\n');
+}
+
 document.getElementById('copySubject').addEventListener('click', async ()=>{
   const text = document.getElementById('subjectText').textContent;
   try{
     await navigator.clipboard.writeText(text);
-    const btn = document.getElementById('copySubject');
-    const old = btn.textContent; btn.textContent = '복사됨 ✓';
-    setTimeout(()=>btn.textContent = old, 1500);
+    toast('메일 제목이 복사되었습니다');
   }catch(e){ alert(text); }
+});
+
+document.getElementById('copyBody').addEventListener('click', async ()=>{
+  if(!LAST.data.length){ toast('아직 데이터를 불러오는 중입니다'); return; }
+  const html = buildEmailHtml();
+  const plain = buildPlainText();
+  try{
+    if(window.ClipboardItem){
+      const item = new ClipboardItem({
+        'text/html': new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([plain], {type:'text/plain'}),
+      });
+      await navigator.clipboard.write([item]);
+    }else{
+      await navigator.clipboard.writeText(plain);
+    }
+    toast('본문이 복사되었습니다 — 메일 작성창에 붙여넣기(Ctrl+V) 하세요');
+  }catch(e){
+    try{ await navigator.clipboard.writeText(plain); toast('서식 없이 텍스트로 복사되었습니다'); }
+    catch(e2){ alert('클립보드 복사를 지원하지 않는 환경입니다.'); }
+  }
 });
 
 (async function init(){
