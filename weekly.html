@@ -116,6 +116,7 @@
   </div>
 
   <div class="toast" id="toast"></div>
+  <div id="copySource" style="position:absolute;left:-99999px;top:0;width:640px;"></div>
 
 </div>
 
@@ -382,17 +383,19 @@ function emCard(d, kind){
   return `
   <td width="33%" style="padding:6px;vertical-align:top;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bg}" style="background-color:${bg};border-left:3px solid ${accent};border-radius:8px;">
-      <tr><td bgcolor="${bg}" style="background-color:${bg};padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td style="font-weight:700;font-size:13px;color:${EM.ink};">${escapeHtml(d.media)}</td>
-          <td align="right">${badge}</td>
-        </tr></table>
-        <div style="display:inline-block;font-size:10px;font-weight:700;color:${EM.teal};background-color:#ffffff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;">${escapeHtml(d.type)}</div>
-        <div style="font-size:12px;color:${EM.inkSoft};line-height:1.5;margin:0 0 10px;">${escapeHtml(d.promo)}</div>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td style="font-size:11px;color:${EM.inkFaint};">${escapeHtml(periodText(d))}</td>
-          <td align="right">${linkHtml}</td>
-        </tr></table>
+      <tr><td bgcolor="${bg}" style="background-color:${bg};padding:0;">
+        <div style="background-color:${bg};border-radius:8px;padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td style="font-weight:700;font-size:13px;color:${EM.ink};">${escapeHtml(d.media)}</td>
+            <td align="right">${badge}</td>
+          </tr></table>
+          <div style="display:inline-block;font-size:10px;font-weight:700;color:${EM.teal};background-color:#ffffff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;">${escapeHtml(d.type)}</div>
+          <div style="font-size:12px;color:${EM.inkSoft};line-height:1.5;margin:0 0 10px;">${escapeHtml(d.promo)}</div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td style="font-size:11px;color:${EM.inkFaint};">${escapeHtml(periodText(d))}</td>
+            <td align="right">${linkHtml}</td>
+          </tr></table>
+        </div>
       </td></tr>
     </table>
   </td>`;
@@ -404,6 +407,76 @@ function emCardRow(cards, kind){
     const filler = Array(pad).fill('<td width="33%"></td>').join('');
     return `<tr>${cells}${filler}</tr>`;
   }).join('');
+}
+function divCard(d, kind){
+  const dday = ddayNum(d);
+  const accent = kind === 'deadline' ? EM.signal : EM.teal;
+  const bg = kind === 'deadline' ? EM.signalTint : EM.tealTint;
+  let badge = '';
+  if(kind === 'deadline' && dday != null){
+    badge = `<span style="display:inline-block;background-color:${EM.signal};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${dday<=0?'D-DAY':'D-'+dday}</span>`;
+  } else if(kind === 'update' && d.tag){
+    const c = d.tag==='new' ? EM.signal : EM.gold;
+    badge = `<span style="display:inline-block;background-color:${c};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
+  }
+  const linkHtml = d.link ? `<a href="${escapeHtml(d.link)}" style="font-size:11px;font-weight:700;color:${EM.teal};text-decoration:none;background-color:#ffffff;padding:3px 9px;border-radius:12px;">공지 보기</a>` : '';
+  return `
+  <div style="display:inline-block;width:31.5%;min-width:150px;vertical-align:top;margin:0 1.5% 12px 0;background-color:${bg};border-left:3px solid ${accent};border-radius:8px;padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
+    <div style="overflow:hidden;margin-bottom:7px;">
+      <span style="font-weight:700;font-size:13px;color:${EM.ink};">${escapeHtml(d.media)}</span>
+      <span style="float:right;">${badge}</span>
+    </div>
+    <div style="display:inline-block;font-size:10px;font-weight:700;color:${EM.teal};background-color:#ffffff;padding:2px 7px;border-radius:9px;margin-bottom:8px;">${escapeHtml(d.type)}</div>
+    <div style="font-size:12px;color:${EM.inkSoft};line-height:1.5;margin-bottom:10px;">${escapeHtml(d.promo)}</div>
+    <div style="overflow:hidden;">
+      <span style="font-size:11px;color:${EM.inkFaint};">${escapeHtml(periodText(d))}</span>
+      <span style="float:right;">${linkHtml}</span>
+    </div>
+  </div>`;
+}
+function divCardGroup(cards){
+  return cards.map(d=>divCard(d, d.__kind)).join('');
+}
+function buildCopySourceHtml(){
+  const {weekly, deadlineSoon, data} = LAST;
+  const todayStr = new Date().toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+  weekly.forEach(d=>d.__kind='update');
+  deadlineSoon.forEach(d=>d.__kind='deadline');
+  const weeklyHtml = weekly.length ? divCardGroup(weekly)
+    : `<div style="font-size:12px;color:${EM.inkFaint};padding:14px;">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</div>`;
+  const deadlineHtml = deadlineSoon.length ? divCardGroup(deadlineSoon)
+    : `<div style="font-size:12px;color:${EM.inkFaint};padding:14px;">종료일이 임박한 진행중 프로모션이 없습니다.</div>`;
+
+  return `
+  <div style="max-width:640px;font-family:'Nanum Gothic',Arial,sans-serif;">
+    <div style="border-bottom:2px solid ${EM.ink};padding-bottom:16px;margin-bottom:20px;">
+      <div style="overflow:hidden;font-size:12px;color:${EM.inkFaint};margin-bottom:10px;">
+        <span>미디어전략실 · 위클리 브리핑</span><span style="float:right;">${todayStr}</span>
+      </div>
+      <div style="font-size:24px;font-weight:800;color:${EM.ink};margin-bottom:8px;">이번 주, 지금 챙겨야 할 프로모션 한눈에</div>
+      <div style="font-size:13px;color:${EM.inkSoft};">신규·변경 <b style="color:${EM.signal};">${weekly.length}건</b>, 종료 임박 <b style="color:${EM.signal};">${deadlineSoon.length}건</b>만 골라서 정리했습니다.</div>
+    </div>
+
+    <div style="font-size:16px;font-weight:800;color:${EM.ink};margin-bottom:4px;">🔥 이번주 프로모션 업데이트 <span style="font-size:12px;color:${EM.inkFaint};font-weight:400;">(${weekly.length}건)</span></div>
+    <div style="font-size:12px;color:${EM.inkSoft};margin-bottom:10px;">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</div>
+    <div style="margin-bottom:20px;">${weeklyHtml}</div>
+
+    <div style="font-size:16px;font-weight:800;color:${EM.ink};margin-bottom:4px;">⏰ 종료일 임박 프로모션 <span style="font-size:12px;color:${EM.inkFaint};font-weight:400;">(가까운 순 ${deadlineSoon.length}건)</span></div>
+    <div style="font-size:12px;color:${EM.inkSoft};margin-bottom:10px;">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</div>
+    <div style="margin-bottom:20px;">${deadlineHtml}</div>
+
+    <div style="background-color:${EM.ink};border-radius:10px;padding:24px;">
+      <div style="overflow:hidden;">
+        <div style="float:left;max-width:70%;">
+          <div style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
+          <div style="font-size:12.5px;color:#C7CBD6;">전체 ${data.length}건을 필터·검색·정렬까지 한 화면에서 확인하세요.</div>
+        </div>
+        <div style="float:right;">
+          <a href="${DASHBOARD_URL}" style="display:inline-block;background-color:#ffffff;color:${EM.ink};font-weight:700;font-size:13px;text-decoration:none;padding:11px 20px;border-radius:20px;">대시보드 열기 →</a>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 function buildEmailHtml(){
   const {weekly, deadlineSoon, data} = LAST;
@@ -481,19 +554,41 @@ document.getElementById('copySubject').addEventListener('click', async ()=>{
 
 document.getElementById('copyBody').addEventListener('click', async ()=>{
   if(!LAST.data.length){ toast('아직 데이터를 불러오는 중입니다'); return; }
-  const html = buildEmailHtml();
   const plain = buildPlainText();
+
+  // 1순위: 브라우저 네이티브 선택-복사. 실제 렌더링을 거쳐 복사되기 때문에
+  // 메일 편집기의 붙여넣기 필터에 걸릴 확률이 훨씬 낮습니다.
+  const source = document.getElementById('copySource');
+  source.innerHTML = buildCopySourceHtml();
   try{
+    const range = document.createRange();
+    range.selectNodeContents(source);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    const ok = document.execCommand('copy');
+    sel.removeAllRanges();
+    source.innerHTML = '';
+    if(ok){
+      toast('본문이 복사되었습니다 — 메일 작성창에 붙여넣기(Ctrl+V) 하세요');
+      return;
+    }
+  }catch(e){ /* 아래 폴백으로 진행 */ }
+
+  // 2순위: Clipboard API에 직접 HTML을 써넣는 방식
+  try{
+    const html = buildEmailHtml();
     if(window.ClipboardItem){
       const item = new ClipboardItem({
         'text/html': new Blob([html], {type:'text/html'}),
         'text/plain': new Blob([plain], {type:'text/plain'}),
       });
       await navigator.clipboard.write([item]);
+      toast('본문이 복사되었습니다 — 메일 작성창에 붙여넣기(Ctrl+V) 하세요');
     }else{
       await navigator.clipboard.writeText(plain);
+      toast('서식 없이 텍스트로 복사되었습니다');
     }
-    toast('본문이 복사되었습니다 — 메일 작성창에 붙여넣기(Ctrl+V) 하세요');
   }catch(e){
     try{ await navigator.clipboard.writeText(plain); toast('서식 없이 텍스트로 복사되었습니다'); }
     catch(e2){ alert('클립보드 복사를 지원하지 않는 환경입니다.'); }
