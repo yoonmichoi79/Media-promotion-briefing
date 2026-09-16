@@ -45,12 +45,11 @@
   .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0 0 4px;}
   .section-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;}
 
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .card{
-    display:inline-block;width:31%;min-width:150px;vertical-align:top;margin:0 1.5% 14px 0;
     border:1px solid transparent;border-radius:10px;overflow:hidden;
     padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
   }
-  /* 화면 크기와 무관하게 항상 한 줄에 3개로 고정 */
   .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
   .card.update-card{background:var(--teal-tint);border-left:3px solid var(--teal);}
   .card-media{font-weight:700;font-size:13.5px;color:var(--ink);}
@@ -292,13 +291,12 @@ function render(data){
     return tb - ta;
   });
 
-  // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 가까운 순
+  // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 14일 이내인 항목 전부 (동일 날짜는 모두 포함, 개수 제한 없음)
   const deadlineSoon = data
     .filter(d=>effStatus(d) !== '종료')
     .map(d=>({d, dday: ddayNum(d)}))
-    .filter(x=>x.dday != null)
+    .filter(x=>x.dday != null && x.dday <= 14)
     .sort((a,b)=>a.dday-b.dday)
-    .slice(0, 12)
     .map(x=>x.d);
 
   LAST = {weekly, deadlineSoon, data};
@@ -310,11 +308,11 @@ function render(data){
     `신규·변경 <span class="stat-inline">${weekly.length}건</span>, 종료 임박 <span class="stat-inline">${deadlineSoon.length}건</span>만 골라서 정리했습니다. 전체 목록은 아래 대시보드에서 확인하세요.`;
 
   const weeklySection = weekly.length ? `
-    <div>${weekly.map(d=>cardHtml(d,'update')).join('')}</div>
+    <div class="card-grid">${weekly.map(d=>cardHtml(d,'update')).join('')}</div>
   ` : `<div class="empty-note">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</div>`;
 
   const deadlineSection = deadlineSoon.length ? `
-    <div>${deadlineSoon.map(d=>cardHtml(d,'deadline')).join('')}</div>
+    <div class="card-grid">${deadlineSoon.map(d=>cardHtml(d,'deadline')).join('')}</div>
   ` : `<div class="empty-note">종료일이 임박한 진행중 프로모션이 없습니다.</div>`;
 
   const nb = 'border:none;border-collapse:collapse;';
@@ -326,8 +324,8 @@ function render(data){
     </div>
 
     <div class="section">
-      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (가까운 순 ${deadlineSoon.length}건)</h2></div>
-      <div class="section-sub">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</div>
+      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (14일 이내 ${deadlineSoon.length}건)</h2></div>
+      <div class="section-sub">신청기한 또는 종료일이 14일 이내로 남은 진행중 프로모션입니다 (가까운 순).</div>
       ${deadlineSection}
     </div>
 
