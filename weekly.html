@@ -51,6 +51,7 @@
     border:1px solid transparent;border-radius:10px;overflow:hidden;
     padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
   }
+  @media(min-width:1000px){ .card{width:23%;} }
   @media(max-width:760px){ .card{width:47%;} }
   @media(max-width:520px){ .card{width:100%;margin-right:0;} }
   .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
@@ -262,18 +263,20 @@ function cardHtml(d, kind){
     tagBadge = `<span class="badge ${d.tag==='new'?'new':'upd'}">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
   }
   const cardClass = kind === 'deadline' ? 'deadline-card' : 'update-card';
-  const nb = 'border:none;border-collapse:collapse;';
+  const bg = kind === 'deadline' ? 'var(--signal-tint)' : 'var(--teal-tint)';
+  const bgHex = kind === 'deadline' ? '#FCE3D8' : '#D8EFEA';
+  const nb = `border:none;border-collapse:collapse;background-color:${bg};`;
   return `
     <div class="card ${cardClass}">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:8px;"><tr>
-        <td style="${nb}"><span class="card-media">${escapeHtml(d.media)}</span></td>
-        <td style="${nb}" align="right">${ddayBadge}${tagBadge}</td>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bgHex}" style="${nb}margin-bottom:8px;"><tr>
+        <td bgcolor="${bgHex}" style="${nb}"><span class="card-media">${escapeHtml(d.media)}</span></td>
+        <td bgcolor="${bgHex}" style="${nb}" align="right">${ddayBadge}${tagBadge}</td>
       </tr></table>
       <span class="card-type">${escapeHtml(d.type)}</span>
       <div class="card-promo">${escapeHtml(d.promo)}</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
-        <td style="${nb}"><span class="card-period">${escapeHtml(periodText(d))}</span></td>
-        <td style="${nb}" align="right">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="card-link">공지 보기</a>` : ''}</td>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bgHex}" style="${nb}"><tr>
+        <td bgcolor="${bgHex}" style="${nb}"><span class="card-period">${escapeHtml(periodText(d))}</span></td>
+        <td bgcolor="${bgHex}" style="${nb}" align="right">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="card-link">공지 보기</a>` : ''}</td>
       </tr></table>
     </div>`;
 }
