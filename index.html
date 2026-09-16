@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>미디어 프로모션 브리핑 · 26년 3분기</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,500;0,600;0,700;1,500&display=swap');
   :root{
     --paper:#F4F5F2; --paper-raised:#FFFFFF;
     --ink:#161D2B; --ink-soft:#4B5468; --ink-faint:#8A93A6;
@@ -21,12 +20,12 @@
     --slate:#54607A; --slate-soft:#E9EBF1;
     --green:#2F7D4E; --green-soft:#E4F0E7;
     --gray:#8A93A6; --gray-soft:#EDEEEC;
-    --serif:'Source Serif 4','Noto Serif KR',Georgia,serif;
-    --sans:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    --serif:'Nanum Gothic',sans-serif;
+    --sans:'Nanum Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5;}
+  body{background:transparent;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5;}
   .wrap{max-width:1220px;margin:0 auto;padding:0 28px 80px;}
 
   /* Masthead */
@@ -37,7 +36,7 @@
   .masthead p.sub{font-size:14.5px;color:var(--ink-soft);margin:0;max-width:640px;}
   .masthead .note{margin-top:14px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
 
-  .source-panel{flex:0 0 260px;background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:16px;font-size:12.5px;align-self:flex-start;}
+  .source-panel{flex:0 0 260px;background:#EDEEEC;border:1px solid var(--line);border-radius:8px;padding:16px;font-size:12.5px;align-self:flex-start;}
   .source-panel .row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
   .source-panel .src-label{font-weight:700;font-size:13px;}
   .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;}
@@ -68,14 +67,14 @@
   .priority h2{font-family:var(--serif);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 14px;}
   .priority h2::before{content:"";width:7px;height:7px;background:var(--signal);border-radius:50%;display:inline-block;}
   .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
-  .pcard{flex:0 0 260px;background:var(--paper-raised);border:1px solid var(--line);padding:14px 16px;border-radius:6px;}
+  .pcard{flex:0 0 260px;background:var(--signal-soft);border:1px solid #F0CFC2;padding:14px 16px;border-radius:6px;}
   .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
   .pcard .media{font-weight:700;font-size:14px;}
   .pcard .promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   .pcard .period{font-size:11.5px;color:var(--ink-faint);}
 
   /* Controls */
-  .controls{position:sticky;top:0;background:var(--paper);padding:14px 0 16px;z-index:10;border-bottom:1px solid var(--line);margin-bottom:6px;}
+  .controls{position:sticky;top:0;background:var(--paper-raised);padding:14px 0 16px;z-index:10;border-bottom:1px solid var(--line);margin-bottom:6px;}
   .control-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;}
   .control-row:last-child{margin-bottom:0;}
   .seg{display:flex;border:1px solid var(--ink);border-radius:20px;overflow:hidden;}
@@ -93,11 +92,11 @@
 
   /* Table */
   .group-title{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink-soft);padding:16px 4px 6px;letter-spacing:.02em;}
-  table{width:100%;border-collapse:collapse;background:var(--paper-raised);}
+  table{width:100%;border-collapse:collapse;background:#FAFBFA;border:1px solid var(--line-soft);}
   thead th{text-align:left;font-size:11.5px;color:var(--ink-faint);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--ink);letter-spacing:.02em;}
   tbody tr{border-bottom:1px solid var(--line-soft);}
   tbody tr.ended{opacity:.55;}
-  tbody tr:hover{background:#FAFAF8;}
+  tbody tr:hover{background:#FFFFFF;}
   tbody td{padding:11px 12px;font-size:13.5px;vertical-align:top;}
   td.col-media{width:118px;font-weight:700;white-space:nowrap;}
   td.col-tag{width:104px;}
@@ -113,7 +112,7 @@
   .flag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.03em;}
   .flag.new{background:var(--signal-soft);color:var(--signal);}
   .flag.update{background:var(--gold-soft);color:var(--gold);}
-  .dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--signal-soft);color:var(--signal);}
+  .dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--purple-soft);color:var(--purple);}
   .badge{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:11px;font-weight:600;}
   .empty{padding:40px 10px;text-align:center;color:var(--ink-faint);font-size:13px;}
 
@@ -134,7 +133,7 @@
   .statusmsg.err{background:var(--signal-soft);color:var(--signal);}
   .drawer-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
 
-  .contact-box{margin-top:44px;background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:16px 18px;font-size:12.5px;color:var(--ink-soft);line-height:1.8;}
+  .contact-box{margin-top:44px;background:#EDEEEC;border:1px solid var(--line);border-radius:8px;padding:16px 18px;font-size:12.5px;color:var(--ink-soft);line-height:1.8;}
   .contact-box b{color:var(--ink);}
   .contact-box a{color:var(--blue);text-decoration:none;}
   .contact-box a:hover{text-decoration:underline;}
@@ -457,6 +456,14 @@ function escapeHtml(s){
     .replace(/'/g, '&#39;');
 }
 
+/* escapeHtml을 거친 문자열에서 <...> 또는 [...] 로 감싸진 구간(꺾쇠/대괄호 포함)을
+   굵게 강조합니다. 이스케이프 이후 문자열만 다루므로 실제 HTML 태그가 생성될 위험은 없습니다. */
+function highlightBrackets(escapedText){
+  return escapedText
+    .replace(/&lt;.*?&gt;/g, m => `<b>${m}</b>`)
+    .replace(/\[.*?\]/g, m => `<b>${m}</b>`);
+}
+
 function periodDisplay(d){
   let main;
   if(d.start && d.end) main = `${escapeHtml(d.start)} ~ ${escapeHtml(d.end)}`;
@@ -503,17 +510,19 @@ function renderPriority(){
   const scroll = document.getElementById('priorityScroll');
   if(items.length===0){ block.style.display='none'; return; }
   block.style.display='';
-  scroll.innerHTML = items.map(d=>`
+  scroll.innerHTML = items.map(d=>{
+    return `
     <div class="pcard">
       <div class="pcard-top">
         <span class="media">${escapeHtml(d.media)}</span>
-        <span class="flag ${d.tag}">${d.tag==='new'?'NEW':'UPDATE'}</span>
+        <span class="flag ${d.tag}" style="background:${d.tag==='new' ? 'var(--signal)' : 'var(--gold)'};color:#fff;">${d.tag==='new'?'NEW':'UPDATE'}</span>
       </div>
-      <div class="promo">${escapeHtml(d.promo)}</div>
+      <div class="promo">${highlightBrackets(escapeHtml(d.promo))}</div>
       <div class="period">${periodDisplay(d)}</div>
       <div style="margin-top:8px;">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function renderChips(){
@@ -564,8 +573,8 @@ function rowHtml(d){
           ${escapeHtml(d.media)}
         </div>
       </td>
-      <td class="col-tag"><span class="badge" style="background:transparent;border:1.5px solid var(--${typeColor}-soft);color:var(--${typeColor})">${escapeHtml(d.type)}</span></td>
-      <td class="col-promo">${escapeHtml(d.promo)}</td>
+      <td class="col-tag"><span class="badge" style="background:var(--${typeColor}-soft);border:1.5px solid var(--${typeColor});color:var(--${typeColor})">${escapeHtml(d.type)}</span></td>
+      <td class="col-promo">${highlightBrackets(escapeHtml(d.promo))}</td>
       <td class="col-period">${periodDisplay(d)}</td>
       <td class="col-status"><span class="badge" style="background:transparent;border:1.5px solid var(--${statusColor}-soft);color:var(--${statusColor})">${escapeHtml(st||'-')}</span></td>
       <td class="col-link">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</td>
