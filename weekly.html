@@ -45,7 +45,7 @@
   .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0 0 4px;}
   .section-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;}
 
-  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:640px;margin:0 auto;}
   .card{
     border:1px solid transparent;border-radius:10px;overflow:hidden;
     padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
@@ -319,12 +319,12 @@ function render(data){
   document.getElementById('content').innerHTML = `
     <div class="section">
       <div class="section-head"><h2>🔥 이번주 프로모션 업데이트 (${weekly.length}건)</h2></div>
-      <div class="section-sub">NEW 또는 UPDATE로 표시된 프로모션만 모았습니다.</div>
+      <div class="section-sub">최근 추가되었거나 변경된 프로모션만 모았습니다.</div>
       ${weeklySection}
     </div>
 
     <div class="section">
-      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (14일 이내 ${deadlineSoon.length}건)</h2></div>
+      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (${deadlineSoon.length}건)</h2></div>
       <div class="section-sub">신청기한 또는 종료일이 14일 이내로 남은 진행중 프로모션입니다 (가까운 순).</div>
       ${deadlineSection}
     </div>
