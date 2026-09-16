@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미디어 프로모션 브리핑 · 26년 3분기</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,500;0,600;0,700;1,500&display=swap');
+  :root{
+    --paper:#F4F5F2; --paper-raised:#FFFFFF;
+    --ink:#161D2B; --ink-soft:#4B5468; --ink-faint:#8A93A6;
+    --line:#DEE1DA; --line-soft:#EAEBE6;
+    --signal:#D9542F; --signal-soft:#FBEAE3;
+    --teal:#0F6E63; --teal-soft:#E1F0EC;
+    --gold:#9C7A1E; --gold-soft:#F5EDD9;
+    --blue:#2A5A8C; --blue-soft:#E4EBF3;
+    --purple:#6A4E9E; --purple-soft:#EDE7F5;
+    --rose:#A24A63; --rose-soft:#F5E5EA;
+    --slate:#54607A; --slate-soft:#E9EBF1;
+    --green:#2F7D4E; --green-soft:#E4F0E7;
+    --gray:#8A93A6; --gray-soft:#EDEEEC;
+    --serif:'Source Serif 4','Noto Serif KR',Georgia,serif;
+    --sans:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:1220px;margin:0 auto;padding:0 28px 80px;}
+
+  /* Masthead */
+  .masthead{border-bottom:2px solid var(--ink);padding:40px 0 20px;margin-bottom:20px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .masthead-main{flex:1;min-width:280px;}
+  .masthead-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink-faint);margin-bottom:14px;gap:12px;}
+  .masthead h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 10px;letter-spacing:-.01em;}
+  .masthead p.sub{font-size:14.5px;color:var(--ink-soft);margin:0;max-width:640px;}
+  .masthead .note{margin-top:14px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
+
+  .source-panel{flex:0 0 260px;background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:16px;font-size:12.5px;align-self:flex-start;}
+  .source-panel .row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .source-panel .src-label{font-weight:700;font-size:13px;}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dot.on{background:var(--green);}
+  .dot.off{background:var(--gray);}
+  .source-panel .meta{color:var(--ink-faint);margin-bottom:10px;line-height:1.6;}
+  .btnrow{display:flex;gap:6px;flex-wrap:wrap;}
+  .btn{font-family:var(--sans);font-size:12px;padding:6px 11px;border-radius:14px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;}
+  .btn.ghost{background:#fff;color:var(--ink);}
+  .btn:disabled{opacity:.5;cursor:default;}
+
+  /* Sheet-style tabs */
+  .sheet-tabs{display:flex;gap:3px;margin-bottom:22px;border-bottom:2px solid var(--ink);}
+  .sheet-tab{padding:10px 22px;background:var(--line-soft);border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;cursor:pointer;font-size:13.5px;color:var(--ink-soft);font-weight:600;position:relative;top:1px;}
+  .sheet-tab .n{font-weight:400;color:var(--ink-faint);margin-left:4px;}
+  .sheet-tab.active{background:var(--paper-raised);color:var(--ink);border-color:var(--ink);border-bottom:1px solid var(--paper-raised);}
+  .sheet-tab.active.tab-ended{color:var(--gray);}
+  .sheet-tab.active.tab-active{color:var(--green);}
+
+  /* Stat bar */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:32px;}
+  .stat{background:var(--paper-raised);padding:14px 16px;}
+  .stat .num{font-family:var(--serif);font-size:24px;font-weight:600;}
+  .stat .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+
+  /* Priority strip */
+  .priority{margin-bottom:40px;}
+  .priority h2{font-family:var(--serif);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 14px;}
+  .priority h2::before{content:"";width:7px;height:7px;background:var(--signal);border-radius:50%;display:inline-block;}
+  .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
+  .pcard{flex:0 0 260px;background:var(--paper-raised);border:1px solid var(--line);padding:14px 16px;border-radius:6px;}
+  .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
+  .pcard .media{font-weight:700;font-size:14px;}
+  .pcard .promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pcard .period{font-size:11.5px;color:var(--ink-faint);}
+
+  /* Controls */
+  .controls{position:sticky;top:0;background:var(--paper);padding:14px 0 16px;z-index:10;border-bottom:1px solid var(--line);margin-bottom:6px;}
+  .control-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;}
+  .control-row:last-child{margin-bottom:0;}
+  .seg{display:flex;border:1px solid var(--ink);border-radius:20px;overflow:hidden;}
+  .seg button{font-family:var(--sans);font-size:13px;padding:7px 15px;border:none;background:transparent;cursor:pointer;color:var(--ink);border-right:1px solid var(--ink);}
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:var(--ink);color:#fff;}
+  select.sortsel{font-family:var(--sans);font-size:13px;padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .search{flex:1;min-width:170px;position:relative;}
+  .search input{width:100%;padding:8px 12px 8px 30px;border:1px solid var(--line);border-radius:20px;font-family:var(--sans);font-size:13px;background:#fff;color:var(--ink);}
+  .search input:focus{outline:none;border-color:var(--ink-soft);}
+  .search::before{content:"⌕";position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:14px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:12px;padding:5px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;white-space:nowrap;}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .count-line{font-size:12px;color:var(--ink-faint);margin:14px 2px 10px;}
+
+  /* Table */
+  .group-title{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink-soft);padding:16px 4px 6px;letter-spacing:.02em;}
+  table{width:100%;border-collapse:collapse;background:var(--paper-raised);}
+  thead th{text-align:left;font-size:11.5px;color:var(--ink-faint);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--ink);letter-spacing:.02em;}
+  tbody tr{border-bottom:1px solid var(--line-soft);}
+  tbody tr.ended{opacity:.55;}
+  tbody tr:hover{background:#FAFAF8;}
+  tbody td{padding:11px 12px;font-size:13.5px;vertical-align:top;}
+  td.col-media{width:118px;font-weight:700;white-space:nowrap;}
+  td.col-tag{width:104px;}
+  td.col-promo{color:var(--ink);}
+  td.col-period{width:150px;color:var(--ink-soft);font-size:12.5px;}
+  td.col-period .deadline-line{color:var(--signal);font-size:11px;margin-top:3px;font-weight:600;}
+  td.col-status{width:88px;}
+  td.col-link{width:58px;text-align:center;}
+  .linkbtn{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:6px;background:var(--slate-soft);color:var(--slate);text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;}
+  .linkbtn:hover{background:var(--ink);color:#fff;}
+  .linkbtn-empty{color:var(--line);font-size:13px;}
+  .flagwrap{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .flag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.03em;}
+  .flag.new{background:var(--signal-soft);color:var(--signal);}
+  .flag.update{background:var(--gold-soft);color:var(--gold);}
+  .dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--signal-soft);color:var(--signal);}
+  .badge{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:11px;font-weight:600;}
+  .empty{padding:40px 10px;text-align:center;color:var(--ink-faint);font-size:13px;}
+
+  /* Settings drawer */
+  .overlay{position:fixed;inset:0;background:rgba(22,29,43,.35);display:none;z-index:50;}
+  .overlay.open{display:block;}
+  .drawer{position:fixed;top:0;right:-420px;width:400px;max-width:92vw;height:100%;background:#fff;z-index:51;box-shadow:-8px 0 30px rgba(0,0,0,.15);transition:right .25s ease;padding:26px 22px;overflow-y:auto;}
+  .drawer.open{right:0;}
+  .drawer h3{font-family:var(--serif);font-size:19px;margin:0 0 6px;}
+  .drawer p{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+  .drawer label{font-size:12.5px;font-weight:700;display:block;margin:16px 0 6px;}
+  .drawer input[type=text]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:var(--sans);}
+  .drawer .close{position:absolute;top:20px;right:20px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink-faint);}
+  .steps{font-size:12px;color:var(--ink-soft);line-height:1.8;background:var(--paper);border-radius:6px;padding:12px 14px;margin-top:10px;}
+  .steps b{color:var(--ink);}
+  .statusmsg{font-size:12px;margin-top:10px;padding:8px 10px;border-radius:6px;}
+  .statusmsg.ok{background:var(--green-soft);color:var(--green);}
+  .statusmsg.err{background:var(--signal-soft);color:var(--signal);}
+  .drawer-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
+  .contact-box{margin-top:44px;background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:16px 18px;font-size:12.5px;color:var(--ink-soft);line-height:1.8;}
+  .contact-box b{color:var(--ink);}
+  .contact-box a{color:var(--blue);text-decoration:none;}
+  .contact-box a:hover{text-decoration:underline;}
+
+  footer{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-faint);}
+
+  @media(max-width:640px){
+    .wrap{padding:0 16px 60px;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    td.col-status{display:none;}
+    thead th:nth-child(5){display:none;}
+    .masthead{padding:26px 0 16px;}
+    .source-panel{flex:1 1 100%;}
+    .sheet-tab{padding:9px 14px;font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="masthead-main">
+      <div class="masthead-top">
+        <span>미디어전략실 · 사내 공유</span>
+        <span id="quarterLabel">업데이트 2026.09</span>
+      </div>
+      <h1>미디어 프로모션 브리핑</h1>
+      <p class="sub">2026년 3분기 · 빅테크 및 버티컬 매체 프로모션 현황입니다. 진행중/종료 탭으로 먼저 구분해서 보고, 종료 임박순으로 우선순위를 확인하세요.</p>
+      <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며, 목록에 없는 프로모션을 알고 계시면 미디어전략팀으로 공유 부탁드립니다.</p>
+    </div>
+    <div class="source-panel">
+      <div class="row1">
+        <span class="src-label"><span class="dot off" id="srcDot"></span><span id="srcLabel">기본 데이터 사용 중</span></span>
+        <button class="btn ghost" id="openSettings" style="padding:4px 9px;">⚙ 연동</button>
+      </div>
+      <div class="meta" id="srcMeta">구글시트를 연결하면 이 페이지가 시트 변경 내용을 그대로 불러옵니다.</div>
+      <div class="btnrow"><button class="btn ghost" id="refreshBtn" style="display:none;">새로고침</button></div>
+    </div>
+  </div>
+
+  <div class="sheet-tabs" id="sheetTabs"></div>
+
+  <div class="stats" id="statBar"></div>
+
+  <div class="priority" id="priorityBlock">
+    <h2>이번 업데이트 신규 · 변경 프로모션</h2>
+    <div class="priority-scroll" id="priorityScroll"></div>
+  </div>
+
+  <div class="controls">
+    <div class="control-row">
+      <div class="seg" id="segMedia">
+        <button data-v="all" class="active">전체 매체</button>
+        <button data-v="bigtech">빅테크</button>
+        <button data-v="vertical">버티컬</button>
+      </div>
+      <div class="seg" id="segAud">
+        <button data-v="all" class="active">전체 대상</button>
+        <button data-v="adv">광고주 대상</button>
+        <button data-v="agency">에이전시 대상</button>
+      </div>
+      <select class="sortsel" id="sortSel">
+        <option value="group">기본순 (매체군별 그룹)</option>
+        <option value="deadline">종료 임박순</option>
+        <option value="updated">최근 업데이트순</option>
+      </select>
+      <div class="search"><input type="text" id="searchBox" placeholder="매체명 또는 프로모션 내용 검색"></div>
+    </div>
+    <div class="control-row" id="chipRow"></div>
+  </div>
+
+  <div class="count-line" id="countLine"></div>
+  <div id="results"></div>
+
+  <div class="contact-box">
+    <b>버티컬 매체 프로모션 신청/부킹 문의</b><br>
+    매체 담당자에게 직접 문의하며, 메일 발송 시 담당 팀을 필수 참조해 주세요.<br>
+    국내 버티컬 — 미디어전략팀 <a href="mailto:playd.media@playd.com">playd.media@playd.com</a><br>
+    해외 버티컬 — 데이터전략팀 <a href="mailto:global_media@playd.com">global_media@playd.com</a><br>
+    프로모션 상세 내용은 각 매체(네이버/카카오/구글/메타/버티컬) Worki 공지사항을 통해 항시 확인할 수 있습니다.
+  </div>
+
+  <footer>플레이디 미디어전략실 · 종료가 임박한 건은 상단 정렬을 "종료 임박순"으로 바꿔 우선 확인해 주세요. 상태(진행중/진행예정/종료)는 시작일·종료일 기준으로 자동 보정되어 표시됩니다.</footer>
+</div>
+
+<!-- Settings drawer -->
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <button class="close" id="closeDrawer">✕</button>
+  <h3>구글시트 연동</h3>
+  <p>이 페이지는 구글시트를 원본으로 실시간 반영할 수 있습니다. 시트를 게시(CSV)한 뒤, 아래에 링크를 붙여넣어 연결하세요. 연결 정보는 이 브라우저에 저장되어 다음에 열 때도 자동으로 불러옵니다.</p>
+
+  <label>게시된 CSV 링크 (또는 구글시트 공유 링크)</label>
+  <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv">
+  <div class="drawer-actions">
+    <button class="btn" id="connectBtn">연결하기</button>
+    <button class="btn ghost" id="disconnectBtn">기본 데이터로 되돌리기</button>
+  </div>
+  <div id="drawerStatus"></div>
+
+  <div class="steps">
+    <b>연동 방법 (추천: 시트 공유 링크 그대로 사용)</b><br>
+    1) 구글시트 우측 상단 <b>공유</b> 버튼 → "링크가 있는 모든 사용자"가 <b>뷰어</b>로 보기 가능하도록 설정<br>
+    2) 브라우저 주소창의 시트 링크(<code>docs.google.com/spreadsheets/d/시트ID/edit...</code>)를 그대로 복사<br>
+    3) 위 입력창에 붙여넣고 연결하기 클릭 — 이 페이지가 자동으로 안정적인 형식으로 변환해서 가져옵니다<br><br>
+    <b>(구버전) 웹에 게시 CSV 링크도 계속 지원됩니다</b><br>
+    파일 → 공유 → 웹에 게시 → CSV로 게시된 링크를 붙여넣어도 동작하지만, 이 방식은 구글 서버 리디렉션 때문에 브라우저에서 간헐적으로 연동 실패가 발생할 수 있습니다. 가능하면 위의 "공유 링크" 방식을 사용해 주세요.<br><br>
+    <b>Worki 링크가 비어 보인다면?</b><br>
+    구글시트에서 셀 텍스트에 하이퍼링크만 걸어둔 경우(예: "링크"라는 글자에 링크를 삽입), CSV로 변환하면 <u>화면에 보이는 글자만</u> 내보내지고 실제 URL은 사라집니다. 이건 구글시트 CSV 변환 자체의 한계라 저희 페이지에서 우회할 수 없습니다.<br><br>
+    해결 방법: <b>공지바로가기</b>처럼 실제 URL을 그대로 텍스트로 담은 컬럼을 하나 추가해 주세요. 이 페이지는 헤더 이름이 '공지바로가기' 또는 '링크'인 컬럼을 자동으로 찾아서 사용합니다. (기존 Worki 컬럼은 사람이 보기 위한 라벨용으로 그대로 두셔도 됩니다)<br><br>
+    <b>시트 헤더 형식 (1행)</b><br>
+    세그먼트, 대상, 매체, 구분, 프로모션, 시작일, 종료일, 신청기한, 상태, 업데이트, 플래그, 공지바로가기<br>
+    · 세그먼트: 빅테크 / 버티컬 &nbsp; · 대상: 광고주 / 에이전시<br>
+    · 상태: 진행중 / 진행예정 / 종료 (시작일·종료일과 오늘 날짜를 비교해 자동 보정되므로 대략적인 값만 입력해도 됩니다)<br>
+    · 시작일/종료일: M/D 형식 (예: 8/1) &nbsp; · 신청기한: 날짜 또는 "선착순" 등 텍스트<br>
+    · 플래그: NEW / UPDATE (없으면 빈 칸) &nbsp; · 공지바로가기: 프로모션 상세 URL (실제 주소 텍스트여야 인식됩니다)
+  </div>
+  <div class="drawer-actions">
+    <button class="btn ghost" id="copyTemplate">헤더+예시행 복사 (시트에 붙여넣기용)</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- Default seed data (원본 메일 기준, 26.09 업데이트) ---------------- */
+const DEFAULT_DATA = [
+// 빅테크 · 광고주
+{seg:'bigtech',aud:'adv',media:'카카오',type:'무상캐시',promo:'<카카오광고ASAP> 신규 : 26년 3분기(YoY) 기준 200만 원 이상 집행 시 최대 120% (개월 별 50%, 70%, 120%) 무상캐시 지급',start:'',end:'8/21',deadline:'8/21',status:'종료',updated:'8/3',link:'https://worki.playd.com/service/kakaomoment/625/view/219615?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'카카오',type:'무상캐시',promo:'<카카오광고ASAP> 증액 : 26년 3분기(YoY) 기준 20% 이상(최소 200만 원) 집행 시 무상캐시 100% 지급',start:'',end:'8/21',deadline:'8/21',status:'종료',updated:'8/3',link:'https://worki.playd.com/service/kakaomoment/625/view/219615?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'카카오',type:'무상캐시',promo:'<커머스카탈로그> : 카탈로그 연동 시 무상캐시 110만원 지원',start:'5/21',end:'9/30',status:'진행중',updated:'5/29',link:'https://worki.playd.com/service/kakaomoment/625/view/217808?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'카카오',type:'무상캐시',promo:'<성장지원> : 신규 상품 테스트 집행시 무상캐시 최대 500만원 지원',start:'7/1',end:'9/30',status:'진행중',updated:'7/9',link:'https://worki.playd.com/service/kakaomoment/625/view/189108?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'단가할인',promo:'<브랜드검색> : 개편상품 할인 (단가표 참조)',start:'6/1',end:'9/30',status:'진행중',updated:'6/10',link:'https://worki.playd.com/service/naver/418/view/214811?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'단가할인',promo:'<NOSP 동영상 상품> : 3분기 동영상 상품 프로모션 안내 및 30% 단가 할인 프로모션 진행',start:'7/1',end:'9/30',status:'진행중',updated:'6/4',link:'https://worki.playd.com/service/naver/889/view/218169'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'단가할인',promo:'<네이버 증권> 독점 스폰서십 "The Stock X" 신규 런칭 기념 최대 50% 할인 프로모션',start:'',end:'',status:'진행중',updated:'6/24',link:'https://worki.playd.com/service/naver/889/view/219847'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'무상캐시',promo:'<신규 광고주 지원> : 신규 광고주 신청 시 무상캐시 50만 원 지원',start:'5/7',end:'',status:'진행중',updated:'5/7',link:'https://worki.playd.com/service/naver/623/view/197854?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'무상캐시',promo:'<ADVoost Screen(브랜드DOOH)> 2n1 패키지 신규 출시 및 비즈쿠폰 50% 환급 프로모션',start:'7/3',end:'8/31',status:'종료',updated:'7/1',link:'https://worki.playd.com/service/naver/623/view/220633?search=&index=0&size=10'},
+{seg:'bigtech',aud:'adv',media:'네이버',type:'무상캐시',promo:'26년 추석+세일 N레벨업 프로모션 (목표 광고비 달성 시 최대 1000만원 리워드 지급)',start:'8/21',end:'9/2',deadline:'선착순',status:'종료',updated:'8/24',link:'https://worki.playd.com/service/naver/623/view/224299?search=&index=0&size=10'},
+// 빅테크 · 에이전시
+{seg:'bigtech',aud:'agency',media:'카카오',type:'수수료',promo:'<카카오광고 ASAP> 신규 : 26년 3분기(YoY) 기준 200만 원 이상 집행 시 수수료 최대 45% 지급',start:'',end:'8/21',deadline:'8/21',status:'종료',updated:'8/3',link:'https://worki.playd.com/service/kakaomoment/625/view/219615?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'카카오',type:'수수료',promo:'<카카오광고 ASAP> 증액 : 26년 3분기(YoY) 기준 20%이상(최소 200만 원) 집행 시 20% 증액분에 대한 수수료 최대 45% 지급',start:'',end:'8/21',deadline:'8/21',status:'종료',updated:'8/3',link:'https://worki.playd.com/service/kakaomoment/625/view/219615?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'구글',type:'상품권',promo:'[내부 프로모션] 제2회 내부 Google Ads 운영 성공 사례 공모전 <사.고.사.곱> - (제출만 해도 1만원 / 우수 사례 선정 시 추가 5만원🎁)',start:'',end:'',deadline:'8/31',status:'종료',updated:'7/31',link:'https://docs.google.com/spreadsheets/d/1VvxN92C9jaLP7NWEIXcmjEc1C__tIBBGVqk5N23SEck/edit?gid=804327792#gid=804327792'},
+{seg:'bigtech',aud:'agency',media:'구글',type:'상품권',promo:'[내부 프로모션] 💰제안만 해도 1만원! 도입 시 10만원 추가 증정!💵 Google 상품 및 기능 제안 프로모션',start:'8/12',end:'10/31',status:'진행중',updated:'8/25',link:'https://docs.google.com/spreadsheets/d/1VvxN92C9jaLP7NWEIXcmjEc1C__tIBBGVqk5N23SEck/edit?gid=804327792#gid=804327792'},
+{seg:'bigtech',aud:'agency',media:'카카오',type:'수수료',promo:'<카카오광고> 비즈보드CPT 집행 시 추가수수료 10% 지급 (총 25%)',start:'7/1',end:'9/30',status:'진행중',updated:'7/1',link:'https://worki.playd.com/service/kakaomoment/625/view/220444?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'카카오',type:'수수료',promo:'<커머스카탈로그> : 카탈로그 집행 시 추가 수수료 15% 지급 (총 30%)',start:'7/1',end:'11/30',status:'진행중',updated:'7/23',link:'https://worki.playd.com/service/naver/623/view/219428?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'상품권',promo:'<자격증> : NAVER Ads Expert 인증시험 론칭 기념 선착순 합격자 및 상위 득점자 네이버페이 지급',start:'',end:'7/12',status:'종료',updated:'6/30',link:'https://worki.playd.com/service/naver/623/view/219428?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'수수료',promo:'<ADVoost 쇼핑>🎁8월 혜택 1탄🚀3개월 연속달성 도전! 최대 22% 수수료 프로모션',start:'',end:'8/31',status:'종료',updated:'8/4',link:'https://worki.playd.com/service/naver/623/view/222789?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'현금',promo:'<ADVoost 쇼핑>🎁8월 혜택 2탄🚀3개월 연속달성을 위한 PlayD 보너스! 💵ADV쇼핑 신규계정 마케터 10만원 (🚩사내프로모션)',start:'',end:'8/31',status:'종료',updated:'8/4',link:'https://worki.playd.com/service/naver/623/view/222793?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'현금',promo:'<네이버SA (파워링크/쇼핑검색) > 올여름 마지막 BOOST 리그 OPEN｜네이버SA 8월 총 상금 2,500만원🚀 (🚩사내 프로모션)',start:'',end:'8/31',status:'종료',updated:'8/24',link:'https://worki.playd.com/service/naver/623/view/222886?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'수수료',promo:'<ADVoost 쇼핑> 9월 혜택 1탄│🔥4개월 연속달성 도전!🔥전사목표 달성시 ★최대 22%★ 수수료 (매체프로모션)',start:'9/1',end:'9/30',status:'진행중',updated:'9/8',tag:'new',link:'https://worki.playd.com/service/naver/623/view/225533?search=&index=0&size=10'},
+{seg:'bigtech',aud:'agency',media:'네이버',type:'현금',promo:'<ADVoost 쇼핑> 9월 혜택 2탄│4개월 연속달성을 위한 💚PlayD 마케터응원금💚, ADV쇼핑 신규계정 10만원💰 (사내프로모션)',start:'9/1',end:'9/30',status:'진행중',updated:'9/8',tag:'new',link:'https://worki.playd.com/service/naver/623/view/225653?search=&index=0&size=10'},
+// 버티컬 · 광고주
+{seg:'vertical',aud:'adv',media:'크리테오',type:'무상캐시',promo:'<크리테오> 월간 페르소나 부스트 프로모션 - 패션업종, 추천 오디언스 캠페인 라이브 시 무상캐시 30% 지급',start:'2/1',end:'',status:'진행중',updated:'9/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/224992?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'핀터레스트',type:'무상캐시',promo:'<핀터레스트> 신규광고주 1000만원 이상 소진 시 광고비 25% 크레딧 제공 프로모션',start:'6/1',end:'',status:'진행중',updated:'6/19',link:'https://worki.playd.com/service/PAMEDIA/49/view/219481?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'스마덱스',type:'무상캐시',promo:'<Smadex> 앱(App) 퍼포먼스 광고 스마덱스 1+1 프로모션',start:'7/1',end:'',status:'진행중',updated:'7/13',link:'https://worki.playd.com/service/PAMEDIA/49/view/221185?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'코비(COVI)',type:'무상캐시/무상서비스',promo:'<COVI> 2026년 플레이디 x COVI 3가지 특별 혜택 제공 프로모션  :  ①반기매출기준 무상쿠폰 ②신규광고주1+1 ③BLS지원',start:'',end:'12/31',status:'진행중',updated:'3/16',link:'https://worki.playd.com/service/PAMEDIA/49/view/195173?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'에이스플래닛',type:'무상캐시',promo:'(ACE PLANET> 알파엠DSP <에이팩스> 리뉴얼 광고비 지원 프로모션 (최대100만원)',start:'',end:'',status:'진행중',updated:'3/13',link:'https://worki.playd.com/service/PAMEDIA/49/view/194778?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'아파트너',type:'단가할인/무상서비스',promo:'<아파트너> 첫거래 패키지 프로모션 + 연간 패키지 프로모션',start:'',end:'',status:'진행중',updated:'3/12',link:'https://worki.playd.com/service/PAMEDIA/49/view/194586?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'타불라',type:'무상캐시',promo:'<타불라> 무상 광고비 최대 1000만원 1+1 프로모션',start:'4/1',end:'',status:'진행중',updated:'3/10',link:'https://worki.playd.com/service/PAMEDIA/49/view/223827?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'타불라',type:'무상캐시',promo:'<타불라> 글로벌 캠페인 성장 지원 프로그램 (20개 캠페인 한정 선착순)',start:'8/1',end:'12/31',deadline:'선착순',status:'진행중',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223827?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'카울리',type:'단가할인',promo:'<카울리> 단독! KB페이 CPC 상품출시 기념 고정CPC단가 할인 프로모션',start:'',end:'12/31',status:'진행중',updated:'2/11',link:'https://worki.playd.com/service/PAMEDIA/49/view/192358?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'캐시플레이',type:'무상서비스',promo:'<캐시플레이> 유료 입점 예약 확정 / 유료 입점 시 광고 무상 제공 프로모션 (게임업종 전용플랫폼)',start:'',end:'',deadline:'유료입점 시',status:'진행중',updated:'1/13',link:'https://worki.playd.com/service/PAMEDIA/49/view/189887?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'컬리개인화광고',type:'무상캐시',promo:'<컬리개인화광고> 광고주 프로모션  ①신규입점사 100% 페이백',start:'',end:'',status:'진행중',updated:'1/8',link:'https://worki.playd.com/service/PAMEDIA/49/view/190159?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'타겟팅게이츠',type:'무상캐시',promo:'<타겟팅게이츠> 신규(휴면)광고주 무상포인트 지급 프로모션 (선착순10개계정 한정)',start:'',end:'',deadline:'선착순',status:'진행중',updated:'12/12',link:'https://worki.playd.com/service/PAMEDIA/49/view/187847?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'후아유',type:'무상캐시',promo:'<후아유> 오픈베타 200만원 무료 광고 서비스',start:'3/1',end:'',status:'진행중',updated:'3/11',link:'https://worki.playd.com/service/PAMEDIA/49/view/164548?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'쿠팡애즈',type:'무상서비스',promo:'<쿠팡플레이> 첫집행 광고주 6~8월 2천만원 이상 집행 시 50% 추가 노출',start:'',end:'8/31',status:'종료',updated:'5/29',link:'https://worki.playd.com/service/PAMEDIA/49/view/217476?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'쿠팡애즈',type:'무상캐시',promo:'<쿠팡애즈> 신규고객타겟팅 광고 \'추천 설정 캠페인\' 광고 지원금 프로모션 (최대 150만원 지원)',start:'7/14',end:'9/30',status:'진행중',updated:'7/14',link:'https://worki.playd.com/service/PAMEDIA/49/view/224616?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'쿠팡애즈',type:'무상서비스',promo:'<쿠팡애즈> 2026 추석 시즌 쿠팡애즈 증액 프로모션 (광고인사이트/모바일 골드박스 미드배너 혜택 제공)',start:'8/25',end:'9/4',deadline:'9/4',status:'종료',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/224636?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'티켓링크',type:'단가할인',promo:'<티켓링크> 스포츠시즌 광고 할인패키지 안내 (2500만원→1500만원/1900만원→1100만원/900만원→550만원)',start:'',end:'7/30',status:'종료',updated:'5/21',link:'https://worki.playd.com/service/PAMEDIA/49/view/218558?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'티켓링크',type:'단가할인',promo:'<티켓링크> 프로야구 정규시즌 성수기 한정 티켓링크 스포츠지면 광고패키지 제안',start:'8/1',end:'9/30',status:'진행중',updated:'8/10',link:'https://worki.playd.com/service/PAMEDIA/49/view/223204?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'토스플레이스',type:'단가할인',promo:'<토스플레이스> 프론트대기화면 시즈널 상품 6~7월 한정 특가',start:'6/1',end:'7/31',status:'종료',updated:'5/26',link:'https://worki.playd.com/service/PAMEDIA/49/view/217489?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'토스애즈',type:'단가할인',promo:'<토스애즈> 라이브 마켓 베이직 상품 반값 할인 프로모션 연장',start:'',end:'9/30',status:'진행중',updated:'5/27',link:'https://worki.playd.com/service/PAMEDIA/49/view/217508?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'토스애즈',type:'무상서비스/지원혜택',promo:'<토스애즈> 업종별 사전 테스터 파이오니어 클럽(Pioneer Club) 파트너 광고주 모집 광고주 혜택 (1~2천만원 예산 지원)',start:'',end:'',deadline:'업종별 선착순',status:'종료',updated:'6/5',link:'https://worki.playd.com/service/PAMEDIA/49/view/218308?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'모비위드',type:'무상서비스',promo:'<모비위드> 안랩 V3 신규광고주 서비스 노출 +60% 추가 제공',start:'',end:'7/31',status:'종료',updated:'6/16',link:'https://worki.playd.com/service/PAMEDIA/49/view/219139?search=&index=0&size=50'},
+{seg:'vertical',aud:'adv',media:'디지털캠프',type:'단가할인/무상서비스',promo:'<디지털캠프> 네이버페이부동산 7월 리뉴얼런칭기념 단가할인 및 무상서비스 프로모션',start:'',end:'7/31',status:'종료',updated:'6/16',link:'https://worki.playd.com/service/PAMEDIA/49/view/219336?search=&index=0&size=50'},
+{seg:'vertical',aud:'adv',media:'마미톡',type:'단가할인',promo:'<마미톡> \'커뮤니티 게시글 배너\' 신규 런칭 기념 단가 할인 (CPM 1만원 ➔ 6천원)',start:'-',end:'-',status:'진행중',updated:'6/26',link:'https://worki.playd.com/service/PAMEDIA/49/view/220312?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'페이코캠퍼스',type:'무상서비스',promo:'<페이코 캠퍼스> 노출극대화 패키지 집행 시 App PUSH 6만건 무료 제공!',start:'',end:'9/30',status:'진행중',updated:'6/30',link:'https://worki.playd.com/service/PAMEDIA/49/view/220313?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'직방/호갱노노',type:'무상서비스/단가할인',promo:'<직방 호갱노노> ①프리미엄 단지마커 집행 혜택 (호갱노노 비즈마커+7월한정 앱푸시)  ②채널톡 집행 혜택(신규시안 적용 추가발송혜택 + 단가할인)',start:'7/1',end:'9/30',status:'진행중',updated:'7/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/220471?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'직방/호갱노노',type:'무상서비스',promo:'<직방/호갱노노> 한가위 한정, 채널톡 발송물량 20% 추가 발송',start:'9/14',end:'9/30',status:'진행중',updated:'9/14',link:'https://worki.playd.com/service/PAMEDIA/49/view/226423?search=&index=0&size=10',tag:'new'},
+{seg:'vertical',aud:'adv',media:'캐시노트',type:'단가할인/무상서비스',promo:'<캐시노트> ①인트로패키지 런칭특가  ②배너+LMS동시집행 프로모션 안내',start:'',end:'7/31',status:'종료',updated:'7/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/221085?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'캐시노트',type:'무상서비스',promo:'<캐시노트> ①예비사장님 타겟확장 혜택  ②신규광고주 크로스채널 체험 프로모션',start:'8/1',end:'8/31',status:'종료',updated:'7/15',link:'https://worki.playd.com/service/PAMEDIA/49/view/221677?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'캐시노트',type:'무상서비스',promo:'<캐시노트> 메시지 광고 프로모션 (메시지 광고 집행 시 100만원 상당의 스플래시 배너 서비스 제공)',start:'9/1',end:'9/30',status:'진행중',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223852?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'트레이딩웍스',type:'무상캐시',promo:'<트레이딩웍스> 삼분기 \'ㅅ·ㅂ·ㄱ\' 업종 신규 캠페인 특별 프로모션 (추가수수료 or 광고크레딧)',start:'9/1',end:'9/30',status:'진행중',updated:'7/7',link:'https://worki.playd.com/service/PAMEDIA/49/view/220837?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'바나나몽키즈',type:'무상서비스',promo:'<바나나몽키즈> 딜링(DILING) 신세계포인트 교육/분앙 외 업종 문자광고 집행 시 10% 추가 발송 혜택 제공',start:'7/1',end:'9/30',status:'진행중',updated:'7/10',link:'https://worki.playd.com/service/PAMEDIA/49/view/221671?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'바나나몽키즈',type:'무상서비스',promo:'<바나나몽키즈> 딜링(DILING) 8월 특별 프로모션 (OK캐시백/티맵/롯데카드/SKT)',start:'8/1',end:'8/31',status:'종료',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223754?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'바나나몽키즈',type:'무상서비스',promo:'<바나나몽키즈> 딜링(DILING) 9월 특별 프로모션 (나이스평가정보/OK캐시백/SKT)',start:'9/1',end:'9/30',status:'진행중',updated:'9/11',link:'https://worki.playd.com/service/PAMEDIA/49/view/226421?search=&index=0&size=10',tag:'new'},
+{seg:'vertical',aud:'adv',media:'바나나몽키즈',type:'무상서비스',promo:'<바나나몽키즈> 딜링(DILING) 티맵 프로모션 (20% 문자광고 추가발송 / 메인홈배너 추가노출) 기간 연장 (~12/31까지)',start:'9/11',end:'12/31',status:'진행중',updated:'9/11',link:'https://worki.playd.com/service/PAMEDIA/49/view/226421?search=&index=0&size=10',tag:'new'},
+{seg:'vertical',aud:'adv',media:'캐시워크',type:'단가할인',promo:'<캐시워크> 용돈라방 베이직형 프로모션 단가 할인 (40만원 ➔ 25만원)',start:'7/1',end:'8/31',status:'종료',updated:'7/14',link:'https://worki.playd.com/service/PAMEDIA/49/view/221674?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'캐시워크',type:'단가할인',promo:'<캐시워크> 가을 특가 프로모션 (LMS 반값 + 동영상 광고 오픈 특가)',start:'9/14',end:'10/31',status:'진행중',updated:'9/14',link:'https://worki.playd.com/service/PAMEDIA/49/view/226431?search=&index=0&size=10',tag:'new'},
+{seg:'vertical',aud:'adv',media:'스노우',type:'단가할인',promo:'<스노우> 스노우/패밀리 스플래시 광고 단가할인 (20%) 프로모션',start:'8/1',end:'10/31',status:'진행중',updated:'7/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/222690?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'모비위드',type:'단가할인',promo:'<모비위드> NEW! 티머니GO 신규 광고상품 런칭 기념 CPM 단가 50% 할인 프로모션',start:'8/1',end:'8/31',status:'종료',updated:'7/30',link:'https://worki.playd.com/service/PAMEDIA/49/view/222681?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'카카오뱅크',type:'무상서비스',promo:'<카카오뱅크> 동영상 광고 출시 기념  혜택탭 상단 광고 (이미지 or 동영상) 추가 서비스 지원',start:'8/1',end:'9/30',status:'진행중',updated:'8/3',link:'https://worki.playd.com/service/PAMEDIA/49/view/222803?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'티엔케이팩토리',type:'무상서비스',promo:'< TNK Factory > TNK 2026 토스 런칭 (2026.06) : 30% 추가물량 제공 프로모션',start:'',end:'8/31',status:'종료',updated:'8/7',link:'https://worki.playd.com/service/PAMEDIA/49/view/223187?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'틱톡',type:'무상캐시',promo:'<틱톡> 올리브영 협력광고 9월 올영세일 패키지 신청 프로모션 : 기집행 브랜드15%~20%, 신규휴면 350만원 광고크레딧',start:'',end:'8/26',deadline:'8/26',status:'종료',updated:'8/4',link:'https://worki.playd.com/service/PAMEDIA/49/view/222730?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'틱톡',type:'무상캐시',promo:'<틱톡>  TikTok 3분기 Agency Advantage Program (AAP) : 신규25%, 성장5%, 스마트/카탈로그광고5% 광고크레딧',start:'7/1',end:'9/30',status:'진행중',updated:'8/10',link:'https://worki.playd.com/service/PAMEDIA/49/view/223229?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'틱톡',type:'무상캐시',promo:'<틱톡> TikTok 잠재고객 DB 수집(Lead Ads) 광고 프로모션 (신규/휴면/크리에이터패키지)',start:'',end:'',deadline:'선착순',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/640/view/224732?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'틱톡',type:'무상캐시',promo:'<틱톡> TikTok F&B 추석 시즌 한정 프로모션 + F&B 광고주 대상 크리에이터 매칭 프로그램',start:'-',end:'-',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/640/view/224825?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'당근마켓',type:'무상캐시',promo:'<당근> 전문가모드 "브랜드 지점 늘리기" 신규 광고 프로모션 (프로모션기간 내 유산소진액의 50% 페이백)',start:'8/12',end:'10/12',status:'진행중',updated:'8/12',link:'https://worki.playd.com/service/PAMEDIA/49/view/223515?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'NHN AD',type:'무상서비스',promo:'< NHN AD > 노크타운 앱푸시 신규런칭 기념 타겟팅 무료 업그레이드 혜택',start:'',end:'8/31',status:'종료',updated:'8/13',link:'https://worki.playd.com/service/PAMEDIA/49/view/223633?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'EMCG',type:'단가할인/무상서비스',promo:'< EMCG > SK 5대 핵심매체·L.POINT 패키지 (단가할인) + 첫 집행 300만원 추가 지원 프로모션',start:'-',end:'-',status:'진행중',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223756?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'키즈노트',type:'무상서비스',promo:'<키즈노트> 1+1 프로모션 : 8월 문의 한정 1000만원 스플래시 광고가 무료!  (선착순 10개 광고주 한정)',start:'',end:'8/31',deadline:'선착순',status:'종료',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223811?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'ADN',type:'단가할인',promo:'< ADN > 추석 명절 캠페인 패키지 상품 안내 (최대 40% 단가할인 : CPC 250원 → 150원 / MO 150원 → 80원 )',start:'',end:'9/18',deadline:'추석까지',status:'진행중',updated:'8/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/223860?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'에이블리',type:'무상캐시/무상서비스',promo:'<에이블> F/W 3-Combo 프로모션 (① 첫집행 시 광고비1+1무상지원 ② 선착순 스페셜광고지면 제공 ③ 타겟팅캠페인 할증면제) - 참여사례추가!',start:'',end:'9/30',status:'진행중',updated:'9/14',link:'https://worki.playd.com/service/PAMEDIA/49/view/224069?search=%EC%97%90%EC%9D%B4%EB%B8%94%EB%A6%AC&index=0&size=10',tag:'update'},
+{seg:'vertical',aud:'adv',media:'NHN AD',type:'무상서비스',promo:'< NHN AD > 대학생 타겟, 페이코 캠퍼스 노출극대화패키지 집행 시 푸시 상품 제공 (6만건)',start:'9/1',end:'12/31',status:'진행중',updated:'8/26',link:'https://worki.playd.com/service/PAMEDIA/49/view/224601?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'모비위드',type:'무상서비스',promo:'<모비위드> \'페이북\' 신규 상품 런칭 및 프로모션 - 집행기간/노출량 추가서비스 (업종별 선착순 3개 한정)',start:'',end:'',deadline:'선착순(업종별 3개)',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/224805?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'트래블월렛',type:'무상서비스',promo:'< 트래블월렛 > 가을 시즌 업종 프로모션 : 500만원 이상 집행 시 무상구좌 제공',start:'',end:'10/31',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/224812?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'NHN AD',type:'단가할인',promo:'<KCP 볼링픽> x <엑스파트너스 골프> 스포츠DOOH PKG 상품 선착순 3개 한정 특별가 프로모션',start:'',end:'10/31',deadline:'선착순 3개',status:'진행중',updated:'9/2',link:'https://worki.playd.com/service/PAMEDIA/49/view/225202?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'SKP AD',type:'무상서비스',promo:'<SKP AD> 오늘의챌린지 신규 광고주 1+1 프로모션 (선착순 10개 광고주 한정)',start:'',end:'',deadline:'별도 고지시까지',status:'진행중',updated:'9/2',link:'https://worki.playd.com/service/PAMEDIA/49/view/225483?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'콴다',type:'무상서비스',promo:'<콴다> 10대 학습 &커뮤니티 앱- 선착순 5건 한정 노출량 +50% 추가 제공',start:'',end:'',deadline:'선착순 5개',status:'진행중',updated:'9/9',tag:'new',link:'https://worki.playd.com/service/PAMEDIA/49/view/225813?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'토스플레이스',type:'무상캐시',promo:'<토스플레이스> 2배 혜택 파격 프로모션 (집행하면 광고가 2배 / 최대 700만원)',start:'9/1',end:'9/30',status:'진행중',updated:'9/9',tag:'new',link:'https://worki.playd.com/service/PAMEDIA/49/view/225823?search=&index=0&size=10'},
+{seg:'vertical',aud:'adv',media:'김캐디',type:'무상서비스',promo:'<김캐디> 추석시즌 한정 프로모션 - 광고지면 20% 추가배정 or 푸시1회 제공 (택1)',start:'9/1',end:'9/30',status:'진행중',updated:'9/9',tag:'new',link:'https://worki.playd.com/service/PAMEDIA/49/view/225824?search=&index=0&size=10'},
+// 버티컬 · 에이전시
+{seg:'vertical',aud:'agency',media:'에이스플래닛',type:'상품권',promo:'<ACE PLANET> 알파엠DSP <에이팩스> 리뉴얼 상품권 프로모션 (10%)',start:'-',end:'-',status:'진행중',updated:'3/13',link:'https://worki.playd.com/service/PAMEDIA/49/view/194778?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'타불라',type:'수수료',promo:'<타불라> 연간 1.4억 목표달성시 10% 인센티브 제공 프로모션 (영상캠페인은 15%)',start:'4/1',end:'3/31',status:'진행중',updated:'3/10',link:'https://worki.playd.com/service/PAMEDIA/49/view/215924?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'몰로코',type:'수수료',promo:'<몰로코> 목표 매출 달성 시 인센티브 지급 프로모션',start:'4/1',end:'',status:'진행중',updated:'5/11',link:'https://worki.playd.com/service/PAMEDIA/49/view/218561?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'타겟팅게이츠',type:'수수료',promo:'<타겟팅게이츠> 26년 신규 광고주 수수료 25% 고정 적용 (1년간)',start:'1/1',end:'12/31',status:'진행중',updated:'12/19',link:'https://worki.playd.com/service/PAMEDIA/49/view/188364?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'직방/호갱노노',type:'수수료',promo:'<직방/호갱노노> 광고대행사 대상 월별 인센티브 프로모션',start:'',end:'',deadline:'매월',status:'진행중',updated:'11/17',link:'https://worki.playd.com/service/PAMEDIA/49/view/185726?search=&index=0&size=50'},
+{seg:'vertical',aud:'agency',media:'카카오뱅크',type:'상품권',promo:'<카카오뱅크> 제안만 해도 1만원 + 부킹 확정시 5만원 상품권 지급',start:'5/1',end:'7/31',status:'종료',updated:'5/4',link:'https://worki.playd.com/service/PAMEDIA/49/view/215884?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'카카오VX',type:'상품권/수수료',promo:'<카카오VX> 25년 여름 시즌 프로모션  ① 추가수수료 2종 ② 담당자리워드 2종',start:'',end:'9/30',status:'진행중',updated:'7/3',link:'https://worki.playd.com/service/PAMEDIA/49/view/220650?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'대홍기획',type:'상품권',promo:'<대홍기획> 메시지광고 집행구간별 모바일교환권 프로모션 (LMS/MMS, APPpush, 카카오톡채널메시지)',start:'5/1',end:'7/31',status:'종료',updated:'4/29',link:'https://worki.playd.com/service/PAMEDIA/49/view/215880?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'디지털캠프',type:'수수료',promo:'<디지털캠프> 파트너 에이전시 한정 프로모션 문자광고 수수료  파격 인상 (SKT 25%, KT/BC카드/국민카드 20%)',start:'5/1',end:'',status:'진행중',updated:'5/18',link:'https://worki.playd.com/service/PAMEDIA/49/view/217474?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'마미톡',type:'사은품',promo:'<마미톡> 6~8월 \'1제안=1치킨\' 프로모션',start:'',end:'8/31',status:'종료',updated:'6/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/218306?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'페이코캠퍼스',type:'상품권',promo:'<페이코 캠퍼스> 제안만 해도 PAYCO포인트 1만 포인트 + 집행 확정 시 PAYCO포인트 10만 포인트 지급',start:'',end:'9/30',status:'진행중',updated:'6/30',link:'https://worki.playd.com/service/PAMEDIA/49/view/220313?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'다윈(인크로스)',type:'상품권',promo:'인크로스 <다윈> 쿠팡플레이 동영상광고 런칭 기념 제안/집행 상품권 프로모션',start:'',end:'9/30',status:'진행중',updated:'7/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/220473?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'페이코(NHN)',type:'수수료',promo:'<페이코> 하반기 대행수수료 상향 프로모션 (50%)',start:'',end:'12/31',status:'진행중',updated:'7/1',link:'https://worki.playd.com/service/PAMEDIA/49/view/220484?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'트레이딩웍스',type:'상품권/수수료',promo:'<트레이딩웍스> 프리퀀시 프로모션 연장 (누적집행 규모별 상품권)  + 삼분기 (\'ㅅ·ㅂ·ㄱ\' )업종 신규 캠페인 (추가수수료 or 광고크레딧) 프로모션',start:'',end:'9/30',status:'진행중',updated:'7/7',link:'https://worki.playd.com/service/PAMEDIA/49/view/220837?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'더리치',type:'상품권/식사권',promo:'<더리치> 호텔식사권 프로모션',start:'8/1',end:'10/31',status:'진행중',updated:'7/30',link:'https://worki.playd.com/service/PAMEDIA/49/view/222689?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'카카오뱅크',type:'상품권',promo:'<카카오뱅크> 동영상 광고 출시 기념  제안/부킹 시 카톡선물하기 상품권 지급',start:'8/1',end:'9/30',status:'진행중',updated:'8/3',link:'https://worki.playd.com/service/PAMEDIA/49/view/222803?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'티엔케이팩토리',type:'상품권',promo:'< TNK Factory > TNK 2026 토스 런칭 (2026.06) 기념 제안/집행 커피쿠폰/상품권 프로모션',start:'',end:'8/31',status:'종료',updated:'8/7',link:'https://worki.playd.com/service/PAMEDIA/49/view/223187?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'당근마켓',type:'상품권',promo:'<당근> 전문가모드 "브지방 써봤당!" 프로모션 - 브랜드 지점 늘리기 제안/운영 사례 모집 (당근포인트 1만원)',start:'8/12',end:'10/12',status:'진행중',updated:'8/12',link:'https://worki.playd.com/service/PAMEDIA/49/view/223516?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'NHN AD',type:'상품권',promo:'< NHN AD > CJ ONE 패키지 상품 프로모션! 제안/집행 시 올리브영 상품권 증정',start:'9/1',end:'11/30',status:'진행중',updated:'8/24',link:'https://worki.playd.com/service/PAMEDIA/49/view/224232?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'NHN AD',type:'상품권',promo:'< NHN AD > 대학생 타겟, 페이코 캠퍼스 제안/집행 페이코포인트 프로모션',start:'9/1',end:'11/30',status:'진행중',updated:'8/26',link:'https://worki.playd.com/service/PAMEDIA/49/view/224601?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'모비위드',type:'수수료',promo:'<모비위드> \'페이북\' 신규 상품 런칭 및 프로모션 - 대행수수료 10% 추가제공 (30개 캠페인 선착순)',start:'',end:'',deadline:'선착순(30개 캠페인)',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/224805?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'트래블월렛',type:'수수료',promo:'<트래블월렛> 추가수수료 프로모션  ( 집행금액별 차등 )',start:'',end:'10/31',status:'진행중',updated:'8/28',link:'https://worki.playd.com/service/PAMEDIA/49/view/224812?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'배달의민족',type:'상품권',promo:'<배달의민족> 9~10월 배민 DA 집행 시 최대 1% 상품권 혜택 프로모션 (9월엔 집행만 해도 기본 5만원)',start:'9/8',end:'10/31',status:'진행중',updated:'9/8',tag:'new',link:'https://worki.playd.com/service/PAMEDIA/49/view/225825?search=&index=0&size=10'},
+{seg:'vertical',aud:'agency',media:'토스플레이스',type:'수수료',promo:'<토스플레이스> 2배 혜택 파격 프로모션 (집행만 해도 대행수수료 2배)',start:'9/1',end:'9/30',status:'진행중',updated:'9/9',tag:'new',link:'https://worki.playd.com/service/PAMEDIA/49/view/225823?search=&index=0&size=10'},
+];
+
+const TYPE_COLOR = {'무상캐시':'teal','무상머니':'teal','수수료':'blue','단가할인':'purple','무상서비스':'slate','지원혜택':'slate','상품권':'gold','식사권':'gold','현금':'signal','사은품':'rose','신규테스트':'slate'};
+function firstColorFor(type){ return TYPE_COLOR[type.split('/')[0].trim()] || 'slate'; }
+const STATUS_COLOR = {'진행중':'green','진행예정':'blue','종료':'gray'};
+
+let DATA = DEFAULT_DATA.slice();
+let state = {tab:'active', seg:'all', aud:'all', type:'all', q:'', sort:'group'};
+const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1V-wd7NNLI_5gF_HFeBqdxUb73CG0VAsSU20ORSqc8sY/gviz/tq?tqx=out:csv&gid=1871294414';
+
+/* ---------------- date helpers ---------------- */
+function parseMD(text){
+  if(!text) return null;
+  const m = /(\d{1,2})\/(\d{1,2})/.exec(text);
+  if(!m) return null;
+  return {month:+m[1], day:+m[2]};
+}
+function computeDates(d){
+  const startMD = parseMD(d.start);
+  const endMD = parseMD(d.end);
+  const startDate = startMD ? new Date(2026, startMD.month-1, startMD.day) : null;
+  let endDate = null;
+  if(endMD){
+    endDate = new Date(2026, endMD.month-1, endMD.day);
+    if(startDate && endDate < startDate) endDate = new Date(2027, endMD.month-1, endMD.day);
+  }
+  const dlMD = parseMD(d.deadline);
+  const deadlineDate = dlMD ? new Date(2026, dlMD.month-1, dlMD.day) : null;
+  return {startDate, endDate, deadlineDate};
+}
+/* 상태 자동 보정: 시트의 원본 상태값과 무관하게, 오늘 날짜가 종료일을 지났으면 '종료',
+   '진행예정'인데 오늘이 이미 시작일 이후(and 종료일 이전)면 '진행중'으로 표시 */
+function effStatus(d){
+  const {startDate, endDate} = computeDates(d);
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(endDate && today > endDate) return '종료';
+  if(d.status === '진행예정' && startDate && today >= startDate && (!endDate || today <= endDate)) return '진행중';
+  return d.status;
+}
+function sortKey(d){
+  const {endDate, deadlineDate} = computeDates(d);
+  const effective = deadlineDate || endDate;
+  const tier = effStatus(d) === '종료' ? 2 : (effective ? 0 : 1);
+  return tier*1e15 + (effective ? effective.getTime() : Number.MAX_SAFE_INTEGER/2);
+}
+function updatedKey(d){
+  const md = parseMD(d.updated);
+  return md ? -(new Date(2026, md.month-1, md.day).getTime()) : 0;
+}
+function ddayLabel(d){
+  if(effStatus(d) === '종료') return null;
+  const {endDate, deadlineDate} = computeDates(d);
+  const effective = deadlineDate || endDate;
+  if(!effective) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.ceil((effective - today) / 86400000);
+  if(diff < 0 || diff > 14) return null;
+  return diff === 0 ? 'D-DAY' : ('D-' + diff);
+}
+/* 시트/기본 데이터의 텍스트를 innerHTML에 그대로 꽂으면, "<카카오광고ASAP>"처럼 꺾쇠로 감싼
+   문구가 실제 HTML 태그로 해석되어 화면에서 사라집니다. 사용자에게 보여줄 모든 텍스트는
+   이 함수로 이스케이프한 뒤 삽입해야 원문 그대로(꺾쇠 포함) 안전하게 표시됩니다. */
+function escapeHtml(s){
+  return (s==null ? '' : String(s))
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function periodDisplay(d){
+  let main;
+  if(d.start && d.end) main = `${escapeHtml(d.start)} ~ ${escapeHtml(d.end)}`;
+  else if(d.end) main = `~ ${escapeHtml(d.end)}`;
+  else if(d.start) main = `${escapeHtml(d.start)} ~`;
+  else main = '-';
+  const dl = d.deadline ? `<div class="deadline-line">신청 ${escapeHtml(d.deadline)}</div>` : '';
+  return `<div>${main}</div>${dl}`;
+}
+
+/* ---------------- rendering ---------------- */
+function renderTabs(){
+  const active = DATA.filter(d=>effStatus(d)!=='종료').length;
+  const ended = DATA.filter(d=>effStatus(d)==='종료').length;
+  const tabs = [
+    {key:'active', label:'진행중 · 예정', n:active, cls:'tab-active'},
+    {key:'ended', label:'종료', n:ended, cls:'tab-ended'},
+    {key:'all', label:'전체 보기', n:DATA.length, cls:''},
+  ];
+  document.getElementById('sheetTabs').innerHTML = tabs.map(t=>`
+    <div class="sheet-tab ${state.tab===t.key?'active '+t.cls:''}" data-k="${t.key}">${t.label}<span class="n">${t.n}</span></div>
+  `).join('');
+  document.querySelectorAll('.sheet-tab').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.tab = el.dataset.k; renderAll(); });
+  });
+}
+
+function renderStats(){
+  const total = DATA.length;
+  const ongoing = DATA.filter(d=>effStatus(d)==='진행중').length;
+  const upcoming = DATA.filter(d=>effStatus(d)==='진행예정').length;
+  const ended = DATA.filter(d=>effStatus(d)==='종료').length;
+  document.getElementById('statBar').innerHTML = `
+    <div class="stat"><div class="num">${total}</div><div class="lbl">전체 프로모션</div></div>
+    <div class="stat"><div class="num">${ongoing}</div><div class="lbl">진행중</div></div>
+    <div class="stat"><div class="num">${upcoming}</div><div class="lbl">진행예정</div></div>
+    <div class="stat"><div class="num">${ended}</div><div class="lbl">종료</div></div>
+  `;
+}
+
+function renderPriority(){
+  const items = DATA.filter(d=>d.tag==='new'||d.tag==='update');
+  const block = document.getElementById('priorityBlock');
+  const scroll = document.getElementById('priorityScroll');
+  if(items.length===0){ block.style.display='none'; return; }
+  block.style.display='';
+  scroll.innerHTML = items.map(d=>`
+    <div class="pcard">
+      <div class="pcard-top">
+        <span class="media">${escapeHtml(d.media)}</span>
+        <span class="flag ${d.tag}">${d.tag==='new'?'NEW':'UPDATE'}</span>
+      </div>
+      <div class="promo">${escapeHtml(d.promo)}</div>
+      <div class="period">${periodDisplay(d)}</div>
+      <div style="margin-top:8px;">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
+    </div>
+  `).join('');
+}
+
+function renderChips(){
+  const pool = DATA.filter(byTab);
+  const types = Array.from(new Set(pool.flatMap(d=>d.type.split('/').map(s=>s.trim()))));
+  const row = document.getElementById('chipRow');
+  row.innerHTML = ['all',...types].map(t=>`<button class="chip ${state.type===t?'active':''}" data-t="${t}">${t==='all'?'전체 유형':t}</button>`).join('');
+  row.querySelectorAll('.chip').forEach(btn=>btn.addEventListener('click',()=>{ state.type = btn.dataset.t; renderResults(); }));
+}
+
+function byTab(d){
+  if(state.tab==='active') return effStatus(d) !== '종료';
+  if(state.tab==='ended') return effStatus(d) === '종료';
+  return true;
+}
+function matches(d){
+  if(!byTab(d)) return false;
+  if(state.seg!=='all' && d.seg!==state.seg) return false;
+  if(state.aud!=='all' && d.aud!==state.aud) return false;
+  if(state.type!=='all' && !d.type.split('/').map(s=>s.trim()).includes(state.type)) return false;
+  if(state.q){
+    const q = state.q.toLowerCase();
+    if(!(d.media.toLowerCase().includes(q) || d.promo.toLowerCase().includes(q))) return false;
+  }
+  return true;
+}
+
+function rowHtml(d){
+  const dday = ddayLabel(d);
+  const st = effStatus(d);
+  return `
+    <tr class="${st==='종료'?'ended':''}">
+      <td class="col-media">
+        <div class="flagwrap">
+          ${d.tag ? `<span class="flag ${d.tag}">${d.tag==='new'?'NEW':'UPD'}</span>` : ''}
+          ${dday ? `<span class="dday">${dday}</span>` : ''}
+          ${escapeHtml(d.media)}
+        </div>
+      </td>
+      <td class="col-tag"><span class="badge" style="background:var(--${firstColorFor(d.type)}-soft);color:var(--${firstColorFor(d.type)})">${escapeHtml(d.type)}</span></td>
+      <td class="col-promo">${escapeHtml(d.promo)}</td>
+      <td class="col-period">${periodDisplay(d)}</td>
+      <td class="col-status"><span class="badge" style="background:var(--${STATUS_COLOR[st]||'slate'}-soft);color:var(--${STATUS_COLOR[st]||'slate'})">${escapeHtml(st||'-')}</span></td>
+      <td class="col-link">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</td>
+    </tr>`;
+}
+
+function renderResults(){
+  const filtered = DATA.filter(matches);
+  document.getElementById('countLine').textContent = `${filtered.length}건의 프로모션이 조회되었습니다.`;
+  const container = document.getElementById('results');
+
+  if(filtered.length===0){
+    container.innerHTML = `<div class="empty">조건에 맞는 프로모션이 없습니다.</div>`;
+    return;
+  }
+
+  const tableHead = `<thead><tr><th>매체</th><th>구분</th><th>프로모션 내용</th><th>기간</th><th>상태</th><th>공지</th></tr></thead>`;
+
+  if(state.sort === 'deadline'){
+    const rows = filtered.slice().sort((a,b)=>sortKey(a)-sortKey(b));
+    container.innerHTML = `<div class="group"><table>${tableHead}<tbody>${rows.map(rowHtml).join('')}</tbody></table></div>`;
+    return;
+  }
+  if(state.sort === 'updated'){
+    const rows = filtered.slice().sort((a,b)=>updatedKey(a)-updatedKey(b));
+    container.innerHTML = `<div class="group"><table>${tableHead}<tbody>${rows.map(rowHtml).join('')}</tbody></table></div>`;
+    return;
+  }
+
+  const segLabel = {bigtech:'빅테크 매체', vertical:'버티컬 매체'};
+  const audLabel = {adv:'광고주 대상', agency:'에이전시 대상'};
+  const segOrder = state.seg==='all' ? ['bigtech','vertical'] : [state.seg];
+  const groups = [];
+  segOrder.forEach(seg=>{
+    const audOrder = state.aud==='all' ? ['adv','agency'] : [state.aud];
+    audOrder.forEach(aud=>{
+      const rows = filtered.filter(d=>d.seg===seg && d.aud===aud);
+      if(rows.length) groups.push({title:`${segLabel[seg]} · ${audLabel[aud]}`, rows});
+    });
+  });
+  container.innerHTML = groups.map(g=>`
+    <div class="group">
+      <div class="group-title">${g.title} (${g.rows.length})</div>
+      <table>${tableHead}<tbody>${g.rows.map(rowHtml).join('')}</tbody></table>
+    </div>
+  `).join('');
+}
+
+function renderAll(){ renderTabs(); renderChips(); renderResults(); }
+
+document.getElementById('segMedia').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  state.seg = e.target.dataset.v;
+  [...e.currentTarget.children].forEach(b=>b.classList.toggle('active', b===e.target));
+  renderResults();
+});
+document.getElementById('segAud').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  state.aud = e.target.dataset.v;
+  [...e.currentTarget.children].forEach(b=>b.classList.toggle('active', b===e.target));
+  renderResults();
+});
+document.getElementById('sortSel').addEventListener('change', e=>{ state.sort = e.target.value; renderResults(); });
+document.getElementById('searchBox').addEventListener('input', e=>{ state.q = e.target.value.trim(); renderResults(); });
+
+/* ---------------- Google Sheet sync ---------------- */
+const overlay = document.getElementById('overlay');
+const drawer = document.getElementById('drawer');
+function openDrawer(){ overlay.classList.add('open'); drawer.classList.add('open'); }
+function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+document.getElementById('openSettings').addEventListener('click', openDrawer);
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+
+function setSourceUI(state, meta){
+  // state: true(연결됨) | false(기본 데이터, 설정 없음) | 'error'(연동 시도했지만 실패)
+  const dot = document.getElementById('srcDot');
+  const label = document.getElementById('srcLabel');
+  if(state === true){
+    dot.className = 'dot on';
+    label.textContent = '구글시트 연동됨';
+  } else if(state === 'error'){
+    dot.className = 'dot off';
+    dot.style.background = '#D9542F';
+    label.textContent = '연동 실패 · 기본 데이터 표시 중';
+  } else {
+    dot.className = 'dot off';
+    dot.style.background = '';
+    label.textContent = '기본 데이터 사용 중';
+  }
+  document.getElementById('srcMeta').textContent = meta || (state ? '' : '구글시트를 연결하면 이 페이지가 시트 변경 내용을 그대로 불러옵니다.');
+  document.getElementById('refreshBtn').style.display = state ? '' : 'none';
+}
+
+function normSeg(v){ v=(v||'').trim(); return v.includes('버티컬') ? 'vertical' : 'bigtech'; }
+function normAud(v){ v=(v||'').trim(); return v.includes('에이전시') ? 'agency' : 'adv'; }
+function normTag(v){ v=(v||'').trim().toUpperCase(); if(v.includes('NEW')) return 'new'; if(v.includes('UPDATE')) return 'update'; return undefined; }
+/* 셀에 "링크"라는 라벨 텍스트가 아니라 실제 URL이 들어있을 때만 유효한 링크로 인정.
+   URL 앞뒤에 다른 글자가 섞여 있어도(예: "상세보기 https://...") 첫 URL을 추출하고,
+   www.로 시작하지만 http(s)가 빠진 경우 자동으로 보완합니다. */
+function normalizeLink(raw){
+  const text = (raw||'').toString().trim();
+  if(!text) return '';
+  const m = /(https?:\/\/[^\s"'<>]+)/i.exec(text);
+  if(m) return m[1];
+  if(/^www\.[^\s"'<>]+\.[a-z]{2,}([/?].*)?$/i.test(text)) return 'https://' + text;
+  return '';
+}
+
+/* 방식 A: 안내드린 표준 헤더(세그먼트,대상,매체,구분,프로모션,시작일,종료일,신청기한,상태,업데이트,플래그,링크)를 그대로 쓰는 시트 */
+function rowsFromStructuredCsv(data){
+  const out = [];
+  data.forEach(r=>{
+    const get = (k)=> r[k] ?? r[k.trim()] ?? '';
+    const media = (get('매체')||'').trim();
+    if(!media) return;
+    out.push({
+      seg: normSeg(get('세그먼트')),
+      aud: normAud(get('대상')),
+      media,
+      type: (get('구분')||'기타').trim(),
+      promo: (get('프로모션')||'').trim(),
+      start: (get('시작일')||'').trim(),
+      end: (get('종료일')||'').trim(),
+      deadline: (get('신청기한')||'').trim(),
+      status: (get('상태')||'진행중').trim(),
+      updated: (get('업데이트')||'').trim(),
+      tag: normTag(get('플래그')),
+      link: normalizeLink(get('링크') || get('공지바로가기')),
+    });
+  });
+  return out;
+}
+
+/* 방식 B: 원본 메일/시트 그대로의 레이아웃 - "📢 빅테크/버티컬", "🎁 광고주/에이전시 대상" 같은
+   섹션 제목 행으로 구분이 표시되는 형태. '매체' 헤더 행이 나올 때마다 그 행에서 각 컬럼(구분/프로모션/
+   시작일/종료일/신청기한/상태/업데이트/공지바로가기 등)의 실제 위치를 다시 읽어오므로, 시트에 컬럼이
+   추가되거나 순서가 바뀌어도 자동으로 맞춰 인식합니다. */
+function rowsFromSectionedCsv(csvText){
+  const parsed = Papa.parse(csvText, {header:false, skipEmptyLines:false});
+  let seg = 'bigtech', aud = 'adv';
+  let colMap = {type:3, promo:4, start:5, end:6, deadline:7, status:9, updated:10, link:11};
+  const out = [];
+  parsed.data.forEach(r=>{
+    const c1 = (r[1]||'').toString().trim();
+    const c2 = (r[2]||'').toString().trim();
+    if(c2 === '매체'){
+      const map = {};
+      r.forEach((cell, idx)=>{
+        const h = (cell||'').toString().trim();
+        if(h==='구분') map.type = idx;
+        else if(h==='프로모션') map.promo = idx;
+        else if(h==='시작일') map.start = idx;
+        else if(h==='종료일') map.end = idx;
+        else if(h==='신청기한') map.deadline = idx;
+        else if(h==='상태') map.status = idx;
+        else if(h==='업데이트') map.updated = idx;
+        else if(h==='공지바로가기' || h==='링크') map.link = idx;
+      });
+      colMap = {...colMap, ...map};
+      return;
+    }
+    if(!c2){
+      if(c1.includes('버티컬')) seg = 'vertical';
+      else if(c1.includes('빅테크')) seg = 'bigtech';
+      if(c1.includes('광고주')) aud = 'adv';
+      else if(c1.includes('에이전시')) aud = 'agency';
+      return;
+    }
+    const type = (r[colMap.type]||'').toString().trim();
+    if(!type) return; // 구분 값이 없으면 데이터 행이 아님 (섹션/메모 행)
+    const linkRaw = (r[colMap.link]||'').toString().trim();
+    out.push({
+      seg, aud,
+      media: c2,
+      type,
+      promo: (r[colMap.promo]||'').toString().trim(),
+      start: (r[colMap.start]||'').toString().trim(),
+      end: (r[colMap.end]||'').toString().trim(),
+      deadline: (r[colMap.deadline]||'').toString().trim(),
+      status: (r[colMap.status]||'').toString().trim() || '진행중',
+      updated: (r[colMap.updated]||'').toString().trim(),
+      tag: normTag(c1),
+      link: normalizeLink(linkRaw),
+    });
+  });
+  return out;
+}
+
+function rowsFromCsv(csvText){
+  const structured = Papa.parse(csvText, {header:true, skipEmptyLines:true});
+  const fields = (structured.meta && structured.meta.fields || []).map(f=>(f||'').trim());
+  if(fields.includes('세그먼트') && fields.includes('매체')){
+    return rowsFromStructuredCsv(structured.data);
+  }
+  return rowsFromSectionedCsv(csvText);
+}
+
+async function tryFetchOnce(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.text();
+}
+
+/* 구글의 "웹에 게시" CSV 링크는 실제로는 googleusercontent.com 쪽 주소로 리디렉션되는데,
+   이 리디렉션 대상이 브라우저의 CORS 정책에 막히는 경우가 있어 직접 연결이 계속 실패할 수
+   있습니다. 시트 구성은 그대로 두고, 대신 직접 연결이 실패하면 공개 CORS 프록시를 통해
+   순서대로 재시도합니다. 원본 데이터 자체는 동일하며 가져오는 경로만 우회합니다. */
+/* 사용자가 '/edit' 형태의 일반 공유 링크를 붙여넣어도 자동으로 리디렉션 없는
+   gviz CSV 주소로 변환합니다. 이미 pub CSV나 gviz 링크면 그대로 둡니다. */
+function normalizeSheetInputUrl(raw){
+  const url = (raw||'').trim();
+  if(!url) return url;
+  if(/\/gviz\/tq/.test(url) || /output=csv/.test(url)) return url; // 이미 CSV/gviz 형식
+  const idMatch = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/.exec(url);
+  if(!idMatch) return url;
+  const id = idMatch[1];
+  const gidMatch = /[?#&]gid=(\d+)/.exec(url);
+  const gid = gidMatch ? gidMatch[1] : null;
+  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv${gid ? '&gid='+gid : ''}`;
+}
+
+function proxyAttempts(url){
+  const enc = encodeURIComponent(url);
+  return [
+    {label:'직접 연결', fetchUrl:url},
+    {label:'프록시 경유 1', fetchUrl:`https://api.allorigins.win/raw?url=${enc}`},
+    {label:'프록시 경유 2', fetchUrl:`https://corsproxy.io/?url=${enc}`},
+    {label:'프록시 경유 3', fetchUrl:`https://api.codetabs.com/v1/proxy?quest=${enc}`},
+  ];
+}
+
+async function fetchSheet(url, silent){
+  const statusEl = document.getElementById('drawerStatus');
+  if(!silent) statusEl.innerHTML = `<div class="statusmsg ok">불러오는 중…</div>`;
+  const attempts = proxyAttempts(url);
+  const tried = [];
+  for(const attempt of attempts){
+    try{
+      const text = await tryFetchOnce(attempt.fetchUrl);
+      const rows = rowsFromCsv(text);
+      if(rows.length === 0) throw new Error('유효한 행을 찾지 못함 (헤더 확인 필요)');
+      DATA = rows;
+      const now = new Date();
+      const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      const via = attempt.label === '직접 연결' ? '' : ` · ${attempt.label}`;
+      setSourceUI(true, `연결됨${via} · ${rows.length}건 · 마지막 동기화 ${timeStr}`);
+      statusEl.innerHTML = `<div class="statusmsg ok">연동 완료${via} (${rows.length}건 불러옴)</div>`;
+      renderStats(); renderPriority(); renderAll();
+      return true;
+    }catch(err){
+      tried.push(`${attempt.label}: ${err.message}`);
+      continue;
+    }
+  }
+  const detail = tried.join(' / ');
+  setSourceUI('error', `연동 실패 · ⚙ 연동에서 자세히 확인`);
+  statusEl.innerHTML = `<div class="statusmsg err">불러오기 실패 — 직접 연결과 프록시 경유 3곳을 모두 시도했지만 안 됐습니다.<br><span style="font-size:11px;">${escapeHtml(detail)}</span><br>잠시 후 새로고침을 다시 눌러보시거나, 시트가 "웹에 게시" 상태로 공개되어 있는지 확인해 주세요.</div>`;
+  return false;
+}
+
+document.getElementById('connectBtn').addEventListener('click', async ()=>{
+  const raw = document.getElementById('sheetUrlInput').value.trim();
+  if(!raw) return;
+  const url = normalizeSheetInputUrl(raw);
+  document.getElementById('sheetUrlInput').value = url;
+  const ok = await fetchSheet(url, false);
+  if(ok){ try{ await window.storage.set('sheet-url', url, false); }catch(e){} }
+});
+document.getElementById('disconnectBtn').addEventListener('click', async ()=>{
+  DATA = DEFAULT_DATA.slice();
+  setSourceUI(false);
+  document.getElementById('sheetUrlInput').value = '';
+  document.getElementById('drawerStatus').innerHTML = '';
+  try{ await window.storage.delete('sheet-url', false); }catch(e){}
+  renderStats(); renderPriority(); renderAll();
+});
+document.getElementById('refreshBtn').addEventListener('click', async ()=>{
+  const url = normalizeSheetInputUrl(document.getElementById('sheetUrlInput').value.trim());
+  if(url) fetchSheet(url, false);
+});
+document.getElementById('copyTemplate').addEventListener('click', async ()=>{
+  const template = '세그먼트,대상,매체,구분,프로모션,시작일,종료일,신청기한,상태,업데이트,플래그,공지바로가기\n버티컬,광고주,예시매체,무상캐시,신규광고주 대상 캐시 지원 프로모션,9/1,10/31,,진행중,9/7,NEW,https://example.com/promo';
+  try{
+    await navigator.clipboard.writeText(template);
+    const btn = document.getElementById('copyTemplate');
+    const old = btn.textContent; btn.textContent = '복사됨 ✓';
+    setTimeout(()=>btn.textContent = old, 1500);
+  }catch(e){ alert('클립보드 복사를 지원하지 않는 환경입니다. 아래 텍스트를 직접 복사해 주세요:\n\n' + template); }
+});
+
+/* ---------------- init ---------------- */
+(async function init(){
+  renderStats(); renderPriority(); renderAll();
+  let urlToUse = null;
+  try{
+    const saved = await window.storage.get('sheet-url', false);
+    if(saved && saved.value) urlToUse = saved.value;
+  }catch(e){ /* no saved config yet */ }
+  if(!urlToUse) urlToUse = DEFAULT_SHEET_URL;
+  document.getElementById('sheetUrlInput').value = urlToUse;
+  const ok = await fetchSheet(urlToUse, true);
+  if(ok){ try{ await window.storage.set('sheet-url', urlToUse, false); }catch(e){} }
+})();
+</script>
+</body>
+</html>
