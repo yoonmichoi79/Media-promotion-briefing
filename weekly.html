@@ -45,7 +45,8 @@
   .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0 0 4px;}
   .section-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;}
 
-  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:640px;margin:0 auto;}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:640px;margin:0;}
+  .section-frame{max-width:640px;margin:0;}
   .card{
     border:1px solid transparent;border-radius:10px;overflow:hidden;
     padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
@@ -330,6 +331,7 @@ function render(data){
     </div>
 
     <div class="section">
+      <div class="section-frame">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#161D2B" style="${nb}background-color:#161D2B;border-radius:14px;"><tr>
         <td bgcolor="#161D2B" style="${nb}background-color:#161D2B;padding:28px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}background-color:#161D2B;"><tr>
@@ -343,6 +345,7 @@ function render(data){
           </tr></table>
         </td>
       </tr></table>
+      </div>
     </div>
   `;
   equalizeCardHeights();
@@ -413,12 +416,20 @@ document.getElementById('selectAllBtn').addEventListener('click', ()=>{
     document.getElementById('subHeadline').textContent = '잠시 후 새로고침하거나, 아래 대시보드에서 직접 확인해 주세요.';
     document.getElementById('content').innerHTML = `
       <div class="section">
-        <div class="cta">
-          <div class="cta-text">
-            <h2>📊 전체 프로모션 대시보드</h2>
-            <p>실시간 데이터는 대시보드에서 바로 확인할 수 있습니다.</p>
-          </div>
-          <a href="${DASHBOARD_URL}" target="_blank" rel="noopener" class="cta-btn">대시보드 열기 →</a>
+        <div class="section-frame">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#161D2B" style="border:none;border-collapse:collapse;background-color:#161D2B;border-radius:14px;"><tr>
+          <td style="border:none;background-color:#161D2B;padding:28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:none;background-color:#161D2B;"><tr>
+              <td style="border:none;background-color:#161D2B;">
+                <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
+                <div style="font-size:13px;color:#C7CBD6;">실시간 데이터는 대시보드에서 바로 확인할 수 있습니다.</div>
+              </td>
+              <td style="border:none;background-color:#161D2B;white-space:nowrap;" align="right" valign="middle">
+                <a href="${DASHBOARD_URL}" target="_blank" rel="noopener" class="cta-btn">대시보드 열기 →</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr></table>
         </div>
       </div>`;
   }
