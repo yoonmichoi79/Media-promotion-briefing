@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미디어 프로모션 위클리 브리핑</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
+<style>
+  :root{
+    --ink:#161D2B; --ink-soft:#4B5468; --ink-faint:#8A93A6;
+    --line:#DEE1DA; --line-soft:#EAEBE6;
+    --signal:#D9542F; --signal-soft:#FDEDE6; --signal-tint:#FCE3D8;
+    --teal:#0F6E63; --teal-soft:#E4F3F0; --teal-tint:#D8EFEA;
+    --gold:#9C7A1E; --gold-soft:#F8F0DA;
+    --green:#2F7D4E; --green-soft:#E9F5EC;
+    --serif:'Nanum Gothic',sans-serif;
+    --sans:'Nanum Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:transparent;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;}
+  .wrap{max-width:1020px;margin:0 auto;padding:36px 24px 70px;background:transparent;}
+
+  /* Subject line suggestion */
+  .subject-box{
+    background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;
+    padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .subject-box .lbl{font-size:11px;color:var(--ink-faint);font-weight:700;letter-spacing:.03em;margin-bottom:3px;}
+  .subject-box .txt{font-size:14px;font-weight:700;color:var(--ink);}
+  .copy-btn{font-family:var(--sans);font-size:12px;padding:6px 12px;border-radius:16px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap;}
+  .copy-btn:hover{background:var(--ink);color:#fff;}
+  .copy-btn.primary{background:var(--ink);color:#fff;}
+  .copy-btn.primary:hover{background:#2A3547;}
+  .toolbar-row{display:flex;justify-content:flex-end;gap:8px;margin-bottom:22px;}
+
+  /* Headline */
+  .headline{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px;}
+  .headline .eyebrow{font-size:12px;color:var(--ink-faint);margin-bottom:10px;}
+  .headline h1{font-family:var(--serif);font-weight:800;font-size:clamp(26px,4vw,36px);margin:0 0 10px;letter-spacing:-.01em;line-height:1.3;}
+  .headline p{font-size:14px;color:var(--ink-soft);margin:0;}
+  .headline .stat-inline{display:inline-block;background:var(--signal-soft);color:var(--signal);font-weight:700;padding:1px 7px;border-radius:4px;margin:0 2px;}
+
+  /* Sections */
+  .section{margin-bottom:40px;}
+  .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0 0 4px;}
+  .section-head .count{font-size:12.5px;color:var(--ink-faint);font-weight:500;}
+  .section-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;}
+
+  .card{
+    display:inline-block;width:31%;min-width:150px;vertical-align:top;margin:0 1.5% 14px 0;
+    border:1px solid transparent;border-radius:10px;overflow:hidden;
+    padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
+  }
+  @media(max-width:760px){ .card{width:47%;} }
+  @media(max-width:520px){ .card{width:100%;margin-right:0;} }
+  .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
+  .card.update-card{background:var(--teal-tint);border-left:3px solid var(--teal);}
+  .card-media{font-weight:700;font-size:13.5px;color:var(--ink);}
+  .badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;}
+  .badge.new{background:var(--signal);color:#fff;}
+  .badge.upd{background:var(--gold);color:#fff;}
+  .badge.dday{background:var(--signal);color:#fff;}
+  .card-type{display:inline-block;font-size:10.5px;font-weight:600;color:var(--teal);background:#fff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;}
+  .card-promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+  .card-period{font-size:11px;color:var(--ink-faint);}
+  .card-link{font-size:11.5px;font-weight:700;color:var(--teal);text-decoration:none;background:#fff;padding:3px 9px;border-radius:12px;}
+  .card-link:hover{background:var(--teal);color:#fff;}
+
+  .empty-note{font-size:12.5px;color:var(--ink-faint);padding:20px 4px;background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;text-align:center;}
+
+  /* CTA */
+  .cta-btn{
+    background:#fff;color:var(--ink);font-weight:700;font-size:14px;text-decoration:none;
+    padding:12px 22px;border-radius:24px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .cta-btn:hover{background:#F4F5F2;}
+
+  .status-line{font-size:12px;color:var(--ink-faint);text-align:center;padding:40px 0;}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;padding:10px 18px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:99;}
+  .toast.show{opacity:1;}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-faint);text-align:center;}
+
+  #emailArea.editing, #subjectText.editing{outline:2px dashed var(--signal);outline-offset:8px;border-radius:8px;}
+  #emailArea.editing *[contenteditable]:focus,
+  #emailArea.editing:focus, #subjectText.editing:focus{outline:none;}
+  .edit-hint{display:none;font-size:11.5px;color:var(--signal);background:var(--signal-soft);padding:6px 12px;border-radius:8px;margin-bottom:16px;}
+  .edit-hint.show{display:block;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="subject-box">
+    <div><div class="lbl">📬 추천 메일 제목</div><div class="txt" id="subjectText">[미디어전략실] 이번 주 프로모션 업데이트 &amp; 종료임박 리스트</div></div>
+    <button class="copy-btn" id="copySubject">제목 복사</button>
+  </div>
+  <div class="toolbar-row">
+    <button class="copy-btn" id="toggleEdit">✏️ 내용 수정</button>
+    <button class="copy-btn primary" id="copyHtmlSource">&lt;/&gt; HTML 소스 복사 (네이버웍스 에디터용)</button>
+  </div>
+
+  <div class="edit-hint" id="editHint">✏️ 수정 모드입니다 — 아래 텍스트를 클릭해서 자유롭게 고치실 수 있습니다. 끝나면 "수정 완료"를 눌러주세요.</div>
+  <div class="edit-hint show" style="background:var(--teal-soft);color:var(--teal);">
+    💡 <b>색상이 그대로 보이게 붙여넣는 방법</b>: 네이버웍스 메일 작성창에서 일반 붙여넣기(Ctrl+V)는 배경색이 지워질 수 있습니다.
+    대신 편집기 툴바의 <code>&lt;/&gt; 에디터</code> 버튼을 눌러 HTML 소스 입력 화면으로 전환한 뒤,
+    아래 "HTML 소스 복사" 버튼으로 복사한 코드를 그 안에 붙여넣고 다시 일반 화면으로 전환해 주세요.
+  </div>
+
+  <div id="emailArea">
+    <div class="headline">
+      <div class="eyebrow"><span>미디어전략실 · 위클리 브리핑</span> · <span id="dateLabel"></span></div>
+      <h1 id="mainHeadline">불러오는 중…</h1>
+      <p id="subHeadline"></p>
+    </div>
+
+    <div id="content">
+      <div class="status-line">구글시트에서 최신 데이터를 불러오는 중입니다…</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+</div>
+
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1V-wd7NNLI_5gF_HFeBqdxUb73CG0VAsSU20ORSqc8sY/gviz/tq?tqx=out:csv&gid=1871294414';
+const DASHBOARD_URL = 'https://yoonmichoi79.github.io/Media-promotion-briefing/';
+
+function escapeHtml(s){
+  return (s==null ? '' : String(s))
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function normalizeLink(raw){
+  const text = (raw||'').toString().trim();
+  if(!text) return '';
+  const m = /(https?:\/\/[^\s"'<>]+)/i.exec(text);
+  if(m) return m[1];
+  if(/^www\.[^\s"'<>]+\.[a-z]{2,}([/?].*)?$/i.test(text)) return 'https://' + text;
+  return '';
+}
+function normTag(v){ v=(v||'').trim().toUpperCase(); if(v.includes('NEW')) return 'new'; if(v.includes('UPDATE')) return 'update'; return undefined; }
+function normSeg(v){ v=(v||'').trim(); return v.includes('버티컬') ? 'vertical' : 'bigtech'; }
+function normAud(v){ v=(v||'').trim(); return v.includes('에이전시') ? 'agency' : 'adv'; }
+
+function rowsFromStructuredCsv(data){
+  const out = [];
+  data.forEach(r=>{
+    const get = (k)=> r[k] ?? r[k.trim()] ?? '';
+    const media = (get('매체')||'').trim();
+    if(!media) return;
+    out.push({
+      seg: normSeg(get('세그먼트')), aud: normAud(get('대상')), media,
+      type:(get('구분')||'기타').trim(), promo:(get('프로모션')||'').trim(),
+      start:(get('시작일')||'').trim(), end:(get('종료일')||'').trim(), deadline:(get('신청기한')||'').trim(),
+      status:(get('상태')||'진행중').trim(), updated:(get('업데이트')||'').trim(),
+      tag: normTag(get('플래그')), link: normalizeLink(get('링크') || get('공지바로가기')),
+    });
+  });
+  return out;
+}
+function rowsFromSectionedCsv(csvText){
+  const parsed = Papa.parse(csvText, {header:false, skipEmptyLines:false});
+  let seg='bigtech', aud='adv';
+  let colMap = {type:3, promo:4, start:5, end:6, deadline:7, status:9, updated:10, link:11};
+  const out = [];
+  parsed.data.forEach(r=>{
+    const c1 = (r[1]||'').toString().trim();
+    const c2 = (r[2]||'').toString().trim();
+    if(c2 === '매체'){
+      const map = {};
+      r.forEach((cell,idx)=>{
+        const h=(cell||'').toString().trim();
+        if(h==='구분') map.type=idx; else if(h==='프로모션') map.promo=idx;
+        else if(h==='시작일') map.start=idx; else if(h==='종료일') map.end=idx;
+        else if(h==='신청기한') map.deadline=idx; else if(h==='상태') map.status=idx;
+        else if(h==='업데이트') map.updated=idx; else if(h==='공지바로가기'||h==='링크') map.link=idx;
+      });
+      colMap = {...colMap, ...map};
+      return;
+    }
+    if(!c2){
+      if(c1.includes('버티컬')) seg='vertical'; else if(c1.includes('빅테크')) seg='bigtech';
+      if(c1.includes('광고주')) aud='adv'; else if(c1.includes('에이전시')) aud='agency';
+      return;
+    }
+    const type=(r[colMap.type]||'').toString().trim();
+    if(!type) return;
+    out.push({
+      seg, aud, media:c2, type,
+      promo:(r[colMap.promo]||'').toString().trim(),
+      start:(r[colMap.start]||'').toString().trim(),
+      end:(r[colMap.end]||'').toString().trim(),
+      deadline:(r[colMap.deadline]||'').toString().trim(),
+      status:(r[colMap.status]||'').toString().trim() || '진행중',
+      updated:(r[colMap.updated]||'').toString().trim(),
+      tag: normTag(c1), link: normalizeLink((r[colMap.link]||'').toString().trim()),
+    });
+  });
+  return out;
+}
+function rowsFromCsv(csvText){
+  const structured = Papa.parse(csvText, {header:true, skipEmptyLines:true});
+  const fields = (structured.meta && structured.meta.fields || []).map(f=>(f||'').trim());
+  if(fields.includes('세그먼트') && fields.includes('매체')) return rowsFromStructuredCsv(structured.data);
+  return rowsFromSectionedCsv(csvText);
+}
+
+function parseMD(text){
+  if(!text) return null;
+  const m = /(\d{1,2})\/(\d{1,2})/.exec(text);
+  if(!m) return null;
+  return {month:+m[1], day:+m[2]};
+}
+function computeDates(d){
+  const s = parseMD(d.start), e = parseMD(d.end);
+  const startDate = s ? new Date(2026, s.month-1, s.day) : null;
+  let endDate = null;
+  if(e){ endDate = new Date(2026, e.month-1, e.day); if(startDate && endDate < startDate) endDate = new Date(2027, e.month-1, e.day); }
+  const dl = parseMD(d.deadline);
+  const deadlineDate = dl ? new Date(2026, dl.month-1, dl.day) : null;
+  return {startDate, endDate, deadlineDate};
+}
+function effStatus(d){
+  const {startDate, endDate} = computeDates(d);
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(endDate && today > endDate) return '종료';
+  if(d.status === '진행예정' && startDate && today >= startDate && (!endDate || today <= endDate)) return '진행중';
+  return d.status;
+}
+function ddayNum(d){
+  const {endDate, deadlineDate} = computeDates(d);
+  const effective = deadlineDate || endDate;
+  if(!effective) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((effective - today) / 86400000);
+}
+function periodText(d){
+  if(d.start && d.end) return `${d.start} ~ ${d.end}`;
+  if(d.end) return `~ ${d.end}`;
+  if(d.start) return `${d.start} ~`;
+  return '-';
+}
+
+async function tryFetchOnce(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return await res.text();
+}
+function proxyAttempts(url){
+  const enc = encodeURIComponent(url);
+  return [url, `https://api.allorigins.win/raw?url=${enc}`, `https://corsproxy.io/?url=${enc}`, `https://api.codetabs.com/v1/proxy?quest=${enc}`];
+}
+async function loadData(){
+  for(const url of proxyAttempts(SHEET_URL)){
+    try{
+      const text = await tryFetchOnce(url);
+      const rows = rowsFromCsv(text);
+      if(rows.length) return rows;
+    }catch(e){ continue; }
+  }
+  throw new Error('데이터를 불러오지 못했습니다');
+}
+
+function cardHtml(d, kind){
+  const dday = ddayNum(d);
+  let ddayBadge = '';
+  if(kind === 'deadline' && dday != null){
+    ddayBadge = `<span class="badge dday">${dday <= 0 ? 'D-DAY' : 'D-'+dday}</span>`;
+  }
+  let tagBadge = '';
+  if(kind === 'update' && d.tag){
+    tagBadge = `<span class="badge ${d.tag==='new'?'new':'upd'}">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
+  }
+  const cardClass = kind === 'deadline' ? 'deadline-card' : 'update-card';
+  const nb = 'border:none;border-collapse:collapse;';
+  return `
+    <div class="card ${cardClass}">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:8px;"><tr>
+        <td style="${nb}"><span class="card-media">${escapeHtml(d.media)}</span></td>
+        <td style="${nb}" align="right">${ddayBadge}${tagBadge}</td>
+      </tr></table>
+      <span class="card-type">${escapeHtml(d.type)}</span>
+      <div class="card-promo">${escapeHtml(d.promo)}</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
+        <td style="${nb}"><span class="card-period">${escapeHtml(periodText(d))}</span></td>
+        <td style="${nb}" align="right">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="card-link">공지 보기</a>` : ''}</td>
+      </tr></table>
+    </div>`;
+}
+
+let LAST = {weekly:[], deadlineSoon:[], data:[]};
+
+function render(data){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const weekAgo = new Date(today.getTime() - 7*86400000);
+
+  // 1) 이번주 업데이트: 업데이트일이 최근 7일 이내 이거나 NEW/UPDATE 플래그가 있는 항목
+  const weekly = data.filter(d=>{
+    if(d.tag === 'new' || d.tag === 'update') return true;
+    const md = parseMD(d.updated);
+    if(!md) return false;
+    const dt = new Date(2026, md.month-1, md.day);
+    return dt >= weekAgo && dt <= today;
+  }).sort((a,b)=>{
+    const ma = parseMD(a.updated), mb = parseMD(b.updated);
+    const ta = ma ? new Date(2026, ma.month-1, ma.day).getTime() : 0;
+    const tb = mb ? new Date(2026, mb.month-1, mb.day).getTime() : 0;
+    return tb - ta;
+  }).slice(0, 9);
+
+  // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 가까운 순
+  const deadlineSoon = data
+    .filter(d=>effStatus(d) !== '종료')
+    .map(d=>({d, dday: ddayNum(d)}))
+    .filter(x=>x.dday != null)
+    .sort((a,b)=>a.dday-b.dday)
+    .slice(0, 9)
+    .map(x=>x.d);
+
+  LAST = {weekly, deadlineSoon, data};
+
+  document.getElementById('dateLabel').textContent = today.toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('mainHeadline').textContent = `이번 주, 지금 챙겨야 할 프로모션 한눈에`;
+  document.getElementById('subHeadline').innerHTML =
+    `신규·변경 <span class="stat-inline">${weekly.length}건</span>, 종료 임박 <span class="stat-inline">${deadlineSoon.length}건</span>만 골라서 정리했습니다. 전체 목록은 아래 대시보드에서 확인하세요.`;
+
+  const weeklySection = weekly.length ? `
+    <div>${weekly.map(d=>cardHtml(d,'update')).join('')}</div>
+  ` : `<div class="empty-note">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</div>`;
+
+  const deadlineSection = deadlineSoon.length ? `
+    <div>${deadlineSoon.map(d=>cardHtml(d,'deadline')).join('')}</div>
+  ` : `<div class="empty-note">종료일이 임박한 진행중 프로모션이 없습니다.</div>`;
+
+  const nb = 'border:none;border-collapse:collapse;';
+  document.getElementById('content').innerHTML = `
+    <div class="section">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:4px;"><tr>
+        <td style="${nb}"><div class="section-head"><h2>🔥 이번주 프로모션 업데이트</h2></div></td>
+        <td style="${nb}" align="right" valign="bottom"><span class="count">${weekly.length}건</span></td>
+      </tr></table>
+      <div class="section-sub">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</div>
+      ${weeklySection}
+    </div>
+
+    <div class="section">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:4px;"><tr>
+        <td style="${nb}"><div class="section-head"><h2>⏰ 종료일 임박 프로모션</h2></div></td>
+        <td style="${nb}" align="right" valign="bottom"><span class="count">가까운 순 ${deadlineSoon.length}건</span></td>
+      </tr></table>
+      <div class="section-sub">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</div>
+      ${deadlineSection}
+    </div>
+
+    <div class="section">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#161D2B" style="${nb}background-color:#161D2B;border-radius:14px;"><tr>
+        <td bgcolor="#161D2B" style="${nb}background-color:#161D2B;padding:28px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}background-color:#161D2B;"><tr>
+            <td style="${nb}background-color:#161D2B;">
+              <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
+              <div style="font-size:13px;color:#C7CBD6;">매체별·유형별 필터, 검색, 종료 임박순 정렬까지 — 전체 ${data.length}건을 한 화면에서 확인하세요.</div>
+            </td>
+            <td style="${nb}background-color:#161D2B;white-space:nowrap;" align="right" valign="middle">
+              <a href="${DASHBOARD_URL}" target="_blank" rel="noopener" class="cta-btn">대시보드 열기 →</a>
+            </td>
+          </tr></table>
+        </td>
+      </tr></table>
+    </div>
+  `;
+  equalizeCardHeights();
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1800);
+}
+
+/* 모든 프로모션 박스 높이를, 그 중 가장 큰 박스에 맞춰 통일합니다. */
+function equalizeCardHeights(){
+  const cards = document.querySelectorAll('#emailArea .card');
+  if(!cards.length) return;
+  cards.forEach(c=>{ c.style.height = 'auto'; });
+  let max = 0;
+  cards.forEach(c=>{ if(c.offsetHeight > max) max = c.offsetHeight; });
+  cards.forEach(c=>{ c.style.height = max + 'px'; });
+}
+let _eqTimer = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_eqTimer);
+  _eqTimer = setTimeout(equalizeCardHeights, 150);
+});
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(()=> equalizeCardHeights());
+}
+
+function buildPlainText(){
+  const {weekly, deadlineSoon, data} = LAST;
+  const lines = ['이번 주, 지금 챙겨야 할 프로모션 한눈에', '', `[이번주 업데이트 ${weekly.length}건]`];
+  weekly.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
+  lines.push('', `[종료 임박 ${deadlineSoon.length}건]`);
+  deadlineSoon.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
+  lines.push('', `전체 대시보드: ${DASHBOARD_URL}`);
+  return lines.join('\n');
+}
+
+document.getElementById('copySubject').addEventListener('click', async ()=>{
+  const text = document.getElementById('subjectText').textContent;
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('메일 제목이 복사되었습니다');
+  }catch(e){ alert(text); }
+});
+
+/* 수정 모드: 켜면 추천 메일 제목과 본문 내용을 모두 직접 클릭해서 고칠 수 있습니다 */
+let editMode = false;
+document.getElementById('toggleEdit').addEventListener('click', ()=>{
+  editMode = !editMode;
+  const area = document.getElementById('emailArea');
+  const subject = document.getElementById('subjectText');
+  area.contentEditable = editMode ? 'true' : 'false';
+  subject.contentEditable = editMode ? 'true' : 'false';
+  area.classList.toggle('editing', editMode);
+  subject.classList.toggle('editing', editMode);
+  document.getElementById('editHint').classList.toggle('show', editMode);
+  document.getElementById('toggleEdit').textContent = editMode ? '✅ 수정 완료' : '✏️ 내용 수정';
+  toast(editMode ? '제목과 본문을 직접 클릭해서 수정하세요' : '수정이 잠겼습니다');
+});
+
+/* HTML 소스 복사용: 표+인라인 스타일로만 구성된 정적 HTML 문자열을 만듭니다.
+   이건 클립보드에 "리치 콘텐츠"로 넣는 게 아니라 "순수 텍스트(코드)"로 복사해서,
+   네이버웍스 등의 '</> 에디터(HTML 소스)' 입력창에 그대로 붙여넣기 위한 용도입니다. */
+const HTMLCOL = {
+  ink:'#161D2B', inkSoft:'#4B5468', inkFaint:'#8A93A6',
+  signal:'#D9542F', signalTint:'#FCE3D8', teal:'#0F6E63', tealTint:'#D8EFEA', gold:'#9C7A1E',
+};
+function htmlCard(d, kind){
+  const dday = ddayNum(d);
+  const accent = kind === 'deadline' ? HTMLCOL.signal : HTMLCOL.teal;
+  const bg = kind === 'deadline' ? HTMLCOL.signalTint : HTMLCOL.tealTint;
+  let badge = '';
+  if(kind === 'deadline' && dday != null){
+    badge = `<span style="display:inline-block;background-color:${HTMLCOL.signal};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${dday<=0?'D-DAY':'D-'+dday}</span>`;
+  } else if(kind === 'update' && d.tag){
+    const c = d.tag==='new' ? HTMLCOL.signal : HTMLCOL.gold;
+    badge = `<span style="display:inline-block;background-color:${c};color:#ffffff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
+  }
+  const linkHtml = d.link ? `<a href="${escapeHtml(d.link)}" style="font-size:11px;font-weight:700;color:${HTMLCOL.teal};text-decoration:none;background-color:#ffffff;padding:3px 9px;border-radius:12px;">공지 보기</a>` : '';
+  const nb = 'border:none;border-collapse:collapse;';
+  return `
+  <td width="33%" valign="top" style="padding:6px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bg}" style="${nb}background-color:${bg};border-left:3px solid ${accent};border-radius:8px;">
+      <tr><td bgcolor="${bg}" style="${nb}background-color:${bg};padding:14px;font-family:'Nanum Gothic',Arial,sans-serif;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
+          <td style="${nb}font-weight:700;font-size:13px;color:${HTMLCOL.ink};">${escapeHtml(d.media)}</td>
+          <td style="${nb}" align="right">${badge}</td>
+        </tr></table>
+        <div style="display:inline-block;font-size:10px;font-weight:700;color:${HTMLCOL.teal};background-color:#ffffff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;">${escapeHtml(d.type)}</div>
+        <div style="font-size:12px;color:${HTMLCOL.inkSoft};line-height:1.5;margin-bottom:10px;">${escapeHtml(d.promo)}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
+          <td style="${nb}font-size:11px;color:${HTMLCOL.inkFaint};">${escapeHtml(periodText(d))}</td>
+          <td style="${nb}" align="right">${linkHtml}</td>
+        </tr></table>
+      </td></tr>
+    </table>
+  </td>`;
+}
+function htmlCardRows(cards, kind){
+  const rows = [];
+  for(let i=0;i<cards.length;i+=3){
+    const chunk = cards.slice(i,i+3);
+    const cells = chunk.map(d=>htmlCard(d,kind)).join('');
+    const filler = Array(3-chunk.length).fill('<td width="33%"></td>').join('');
+    rows.push(`<tr>${cells}${filler}</tr>`);
+  }
+  return rows.join('');
+}
+function buildHtmlSource(){
+  const {weekly, deadlineSoon, data} = LAST;
+  const subject = document.getElementById('subjectText').innerText.trim();
+  const todayStr = new Date().toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+  const nb = 'border:none;border-collapse:collapse;';
+  const weeklyRows = weekly.length ? htmlCardRows(weekly,'update')
+    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${HTMLCOL.inkFaint};">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</td></tr>`;
+  const deadlineRows = deadlineSoon.length ? htmlCardRows(deadlineSoon,'deadline')
+    : `<tr><td style="padding:16px;text-align:center;font-size:12px;color:${HTMLCOL.inkFaint};">종료일이 임박한 진행중 프로모션이 없습니다.</td></tr>`;
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}font-family:'Nanum Gothic',Arial,sans-serif;">
+<tr><td align="center">
+<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="${nb}max-width:640px;width:100%;">
+
+<tr><td style="border-bottom:2px solid ${HTMLCOL.ink};padding:0 4px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
+    <td style="${nb}font-size:12px;color:${HTMLCOL.inkFaint};">미디어전략실 · 위클리 브리핑</td>
+    <td style="${nb}font-size:12px;color:${HTMLCOL.inkFaint};" align="right">${todayStr}</td>
+  </tr></table>
+  <div style="font-size:24px;font-weight:800;color:${HTMLCOL.ink};margin:10px 0 8px;">이번 주, 지금 챙겨야 할 프로모션 한눈에</div>
+  <div style="font-size:13px;color:${HTMLCOL.inkSoft};">신규·변경 <b style="color:${HTMLCOL.signal};">${weekly.length}건</b>, 종료 임박 <b style="color:${HTMLCOL.signal};">${deadlineSoon.length}건</b>만 골라서 정리했습니다.</div>
+</td></tr>
+
+<tr><td style="height:22px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+<tr><td style="font-size:16px;font-weight:800;color:${HTMLCOL.ink};padding-bottom:4px;">🔥 이번주 프로모션 업데이트 <span style="font-size:12px;color:${HTMLCOL.inkFaint};font-weight:400;">(${weekly.length}건)</span></td></tr>
+<tr><td style="font-size:12px;color:${HTMLCOL.inkSoft};padding-bottom:10px;">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</td></tr>
+<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}">${weeklyRows}</table></td></tr>
+
+<tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+<tr><td style="font-size:16px;font-weight:800;color:${HTMLCOL.ink};padding-bottom:4px;">⏰ 종료일 임박 프로모션 <span style="font-size:12px;color:${HTMLCOL.inkFaint};font-weight:400;">(가까운 순 ${deadlineSoon.length}건)</span></td></tr>
+<tr><td style="font-size:12px;color:${HTMLCOL.inkSoft};padding-bottom:10px;">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</td></tr>
+<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}">${deadlineRows}</table></td></tr>
+
+<tr><td style="height:26px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+<tr><td>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${HTMLCOL.ink}" style="${nb}background-color:${HTMLCOL.ink};border-radius:10px;"><tr>
+    <td bgcolor="${HTMLCOL.ink}" style="${nb}background-color:${HTMLCOL.ink};padding:24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}"><tr>
+        <td style="${nb}">
+          <div style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:6px;">📊 전체 프로모션 대시보드</div>
+          <div style="font-size:12.5px;color:#C7CBD6;">전체 ${data.length}건을 필터·검색·정렬까지 한 화면에서 확인하세요.</div>
+        </td>
+        <td style="${nb}white-space:nowrap;" align="right" valign="middle">
+          <a href="${DASHBOARD_URL}" style="display:inline-block;background-color:#ffffff;color:${HTMLCOL.ink};font-weight:700;font-size:13px;text-decoration:none;padding:11px 20px;border-radius:20px;">대시보드 열기 →</a>
+        </td>
+      </tr></table>
+    </td></tr>
+  </table>
+</td></tr>
+
+</table>
+</td></tr>
+</table>`;
+}
+document.getElementById('copyHtmlSource').addEventListener('click', async ()=>{
+  if(!LAST.data.length){ toast('아직 데이터를 불러오는 중입니다'); return; }
+  const html = buildHtmlSource();
+  try{
+    await navigator.clipboard.writeText(html);
+    toast('HTML 코드가 복사되었습니다 — 메일 편집기의 "</> 에디터"(HTML 소스) 창에 붙여넣으세요');
+  }catch(e){
+    alert('클립보드 복사가 차단된 환경입니다. 개발자 도구 콘솔에서 코드를 확인해 주세요.');
+    console.log(html);
+  }
+});
+
+(async function init(){
+  try{
+    const data = await loadData();
+    render(data);
+  }catch(e){
+    document.getElementById('mainHeadline').textContent = '데이터를 불러오지 못했습니다';
+    document.getElementById('subHeadline').textContent = '잠시 후 새로고침하거나, 아래 대시보드에서 직접 확인해 주세요.';
+    document.getElementById('content').innerHTML = `
+      <div class="section">
+        <div class="cta">
+          <div class="cta-text">
+            <h2>📊 전체 프로모션 대시보드</h2>
+            <p>실시간 데이터는 대시보드에서 바로 확인할 수 있습니다.</p>
+          </div>
+          <a href="${DASHBOARD_URL}" target="_blank" rel="noopener" class="cta-btn">대시보드 열기 →</a>
+        </div>
+      </div>`;
+  }
+})();
+</script>
+</body>
+</html>
