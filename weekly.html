@@ -43,7 +43,6 @@
   /* Sections */
   .section{margin-bottom:40px;}
   .section-head h2{font-family:var(--serif);font-size:19px;font-weight:800;margin:0 0 4px;}
-  .section-head .count{font-size:12.5px;color:var(--ink-faint);font-weight:500;}
   .section-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;}
 
   .card{
@@ -51,9 +50,7 @@
     border:1px solid transparent;border-radius:10px;overflow:hidden;
     padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
   }
-  @media(min-width:1000px){ .card{width:23%;} }
-  @media(max-width:760px){ .card{width:47%;} }
-  @media(max-width:520px){ .card{width:100%;margin-right:0;} }
+  /* 화면 크기와 무관하게 항상 한 줄에 3개로 고정 */
   .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
   .card.update-card{background:var(--teal-tint);border-left:3px solid var(--teal);}
   .card-media{font-weight:700;font-size:13.5px;color:var(--ink);}
@@ -329,19 +326,13 @@ function render(data){
   const nb = 'border:none;border-collapse:collapse;';
   document.getElementById('content').innerHTML = `
     <div class="section">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:4px;"><tr>
-        <td style="${nb}"><div class="section-head"><h2>🔥 이번주 프로모션 업데이트</h2></div></td>
-        <td style="${nb}" align="right" valign="bottom"><span class="count">${weekly.length}건</span></td>
-      </tr></table>
+      <div class="section-head"><h2>🔥 이번주 프로모션 업데이트 (${weekly.length}건)</h2></div>
       <div class="section-sub">최근 7일 내 신규 등록되었거나 내용이 바뀐 프로모션입니다.</div>
       ${weeklySection}
     </div>
 
     <div class="section">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${nb}margin-bottom:4px;"><tr>
-        <td style="${nb}"><div class="section-head"><h2>⏰ 종료일 임박 프로모션</h2></div></td>
-        <td style="${nb}" align="right" valign="bottom"><span class="count">가까운 순 ${deadlineSoon.length}건</span></td>
-      </tr></table>
+      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (가까운 순 ${deadlineSoon.length}건)</h2></div>
       <div class="section-sub">신청기한 또는 종료일이 가장 가까운 진행중 프로모션 순서입니다.</div>
       ${deadlineSection}
     </div>
