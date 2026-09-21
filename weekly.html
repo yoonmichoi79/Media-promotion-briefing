@@ -49,24 +49,21 @@
   @media(max-width:600px){ .card-grid{grid-template-columns:repeat(2,1fr);} }
   @media(max-width:420px){ .card-grid{grid-template-columns:1fr;} }
   .section-frame{max-width:640px;margin:0;}
-  .card{
-    border:1px solid transparent;border-radius:10px;overflow:hidden;
-    padding:16px 16px 14px;box-shadow:0 1px 2px rgba(22,29,43,.04);
-  }
-  .card.deadline-card{background:var(--signal-tint);border-left:3px solid var(--signal);}
-  .card.update-card{background:var(--teal-tint);border-left:3px solid var(--teal);}
-  .card-media{font-weight:700;font-size:13.5px;color:var(--ink);}
-  .badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;}
-  .badge.new{background:var(--signal);color:#fff;}
-  .badge.upd{background:var(--gold);color:#fff;}
-  .badge.dday{background:var(--signal);color:#fff;}
-  .card-type{display:inline-block;font-size:10.5px;font-weight:600;color:var(--teal);background:#fff;padding:2px 7px;border-radius:9px;margin:7px 0 8px;}
-  .card-promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
-  .card-period{font-size:11px;color:var(--ink-faint);}
-  .card-link{font-size:11.5px;font-weight:700;color:var(--teal);text-decoration:none;background:#fff;padding:3px 9px;border-radius:12px;}
-  .card-link:hover{background:var(--teal);color:#fff;}
 
   .empty-note{font-size:12.5px;color:var(--ink-faint);padding:20px 4px;background:#FBFBFA;border:1px dashed var(--line);border-radius:10px;text-align:center;}
+
+  /* 스크린샷 자리표시자 */
+  .screenshot-slot{border:2px dashed var(--line);border-radius:12px;background:#FBFBFA;
+    min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:24px;margin-bottom:28px;color:var(--ink-faint);}
+  .screenshot-slot .icon{font-size:28px;margin-bottom:8px;}
+  .screenshot-slot .txt{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .screenshot-slot .sub{font-size:11.5px;margin-top:4px;}
+
+  /* 요약 설명 */
+  .summary-list{font-size:13.5px;color:var(--ink-soft);line-height:2;margin:0;padding-left:20px;}
+  .summary-list li b{color:var(--ink);}
+  .summary-list .stat-inline{display:inline-block;background:var(--signal-soft);color:var(--signal);font-weight:700;padding:1px 7px;border-radius:4px;margin:0 2px;}
 
   /* CTA */
   .cta-btn{
@@ -251,50 +248,15 @@ async function loadData(){
   throw new Error('데이터를 불러오지 못했습니다');
 }
 
-function cardHtml(d, kind){
-  const dday = ddayNum(d);
-  let ddayBadge = '';
-  if(kind === 'deadline' && dday != null){
-    ddayBadge = `<span class="badge dday">${dday <= 0 ? 'D-DAY' : 'D-'+dday}</span>`;
-  }
-  let tagBadge = '';
-  if(kind === 'update' && d.tag){
-    tagBadge = `<span class="badge ${d.tag==='new'?'new':'upd'}">${d.tag==='new'?'NEW':'UPDATE'}</span>`;
-  }
-  const cardClass = kind === 'deadline' ? 'deadline-card' : 'update-card';
-  const bg = kind === 'deadline' ? 'var(--signal-tint)' : 'var(--teal-tint)';
-  const bgHex = kind === 'deadline' ? '#FCE3D8' : '#D8EFEA';
-  const nb = `border:none;border-collapse:collapse;background-color:${bg};`;
-  return `
-    <div class="card ${cardClass}">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bgHex}" style="${nb}margin-bottom:8px;"><tr>
-        <td bgcolor="${bgHex}" style="${nb}"><span class="card-media">${escapeHtml(d.media)}</span></td>
-        <td bgcolor="${bgHex}" style="${nb}" align="right">${ddayBadge}${tagBadge}</td>
-      </tr></table>
-      <span class="card-type">${escapeHtml(d.type)}</span>
-      <div class="card-promo">${escapeHtml(d.promo)}</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${bgHex}" style="${nb}"><tr>
-        <td bgcolor="${bgHex}" style="${nb}"><span class="card-period">${escapeHtml(periodText(d))}</span></td>
-        <td bgcolor="${bgHex}" style="${nb}" align="right">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="card-link">공지 보기</a>` : ''}</td>
-      </tr></table>
-    </div>`;
-}
-
 let LAST = {weekly:[], deadlineSoon:[], data:[]};
 
 function render(data){
   const today = new Date(); today.setHours(0,0,0,0);
 
-  // 1) 이번주 업데이트: NEW 또는 UPDATE로 표시된 항목만, 개수 제한 없이 모두 표시
-  const weekly = data.filter(d => d.tag === 'new' || d.tag === 'update')
-  .sort((a,b)=>{
-    const ma = parseMD(a.updated), mb = parseMD(b.updated);
-    const ta = ma ? new Date(2026, ma.month-1, ma.day).getTime() : 0;
-    const tb = mb ? new Date(2026, mb.month-1, mb.day).getTime() : 0;
-    return tb - ta;
-  });
+  // 1) 이번주 업데이트: NEW 또는 UPDATE로 표시된 항목만
+  const weekly = data.filter(d => d.tag === 'new' || d.tag === 'update');
 
-  // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 14일 이내인 항목 전부 (동일 날짜는 모두 포함, 개수 제한 없음)
+  // 2) 종료 임박: 진행중/예정이면서 유효 마감일이 14일 이내인 항목 전부
   const deadlineSoon = data
     .filter(d=>effStatus(d) !== '종료')
     .map(d=>({d, dday: ddayNum(d)}))
@@ -302,34 +264,33 @@ function render(data){
     .sort((a,b)=>a.dday-b.dday)
     .map(x=>x.d);
 
+  const ongoing = data.filter(d=>effStatus(d) !== '종료');
+
   LAST = {weekly, deadlineSoon, data};
 
   const mm = today.getMonth()+1, dd = today.getDate();
   document.getElementById('subjectText').textContent = `[매체프로모션/공유] 최신 업데이트 & 종료임박 리스트_${mm}/${dd}`;
   document.getElementById('mainHeadline').textContent = `이번 주, 지금 챙겨야 할 프로모션 한눈에`;
   document.getElementById('subHeadline').innerHTML =
-    `신규·변경 <span class="stat-inline">${weekly.length}건</span>, 종료 임박 <span class="stat-inline">${deadlineSoon.length}건</span>만 골라서 정리했습니다. 전체 목록은 아래 대시보드에서 확인하세요.`;
-
-  const weeklySection = weekly.length ? `
-    <div class="card-grid">${weekly.map(d=>cardHtml(d,'update')).join('')}</div>
-  ` : `<div class="empty-note">이번 주 새로 등록되거나 변경된 프로모션이 없습니다.</div>`;
-
-  const deadlineSection = deadlineSoon.length ? `
-    <div class="card-grid">${deadlineSoon.map(d=>cardHtml(d,'deadline')).join('')}</div>
-  ` : `<div class="empty-note">종료일이 임박한 진행중 프로모션이 없습니다.</div>`;
+    `신규·변경 <span class="stat-inline">${weekly.length}건</span>, 종료 임박 <span class="stat-inline">${deadlineSoon.length}건</span>이 있습니다. 자세한 목록은 아래 대시보드에서 확인하세요.`;
 
   const nb = 'border:none;border-collapse:collapse;';
   document.getElementById('content').innerHTML = `
-    <div class="section">
-      <div class="section-head"><h2>🔥 이번주 프로모션 업데이트 (${weekly.length}건)</h2></div>
-      <div class="section-sub">최근 추가되었거나 변경된 프로모션만 모았습니다.</div>
-      ${weeklySection}
+    <div class="screenshot-slot">
+      <div class="icon">🖼️</div>
+      <div class="txt">여기에 대시보드 상단 화면 캡처를 붙여넣어 주세요</div>
+      <div class="sub">(브라우저에서 대시보드 상단을 캡처한 뒤, 이 영역에 이미지로 삽입)</div>
     </div>
 
     <div class="section">
-      <div class="section-head"><h2>⏰ 종료일 임박 프로모션 (${deadlineSoon.length}건)</h2></div>
-      <div class="section-sub">신청기한 또는 종료일이 14일 이내로 남은 진행중 프로모션입니다 (가까운 순).</div>
-      ${deadlineSection}
+      <div class="section-head"><h2>📋 대시보드에서 확인할 수 있는 내용</h2></div>
+      <ul class="summary-list">
+        <li>전체 <b>${data.length}건</b>의 매체 프로모션 진행 현황 (그 중 진행중 <b>${ongoing.length}건</b>)</li>
+        <li>이번 주 신규·변경 <span class="stat-inline">${weekly.length}건</span></li>
+        <li>종료임박(14일 이내) <span class="stat-inline">${deadlineSoon.length}건</span></li>
+        <li>빅테크·버티컬 / 광고주·에이전시 대상별 필터, 매체명·프로모션 내용 검색</li>
+        <li>기본순 · 종료 임박순 · 최근 업데이트순 정렬</li>
+      </ul>
     </div>
 
     <div class="section">
@@ -350,7 +311,6 @@ function render(data){
       </div>
     </div>
   `;
-  equalizeCardHeights();
 }
 
 function toast(msg){
@@ -358,34 +318,6 @@ function toast(msg){
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'), 1800);
-}
-
-/* 모든 프로모션 박스 높이를, 그 중 가장 큰 박스에 맞춰 통일합니다. */
-function equalizeCardHeights(){
-  const cards = document.querySelectorAll('#emailArea .card');
-  if(!cards.length) return;
-  cards.forEach(c=>{ c.style.height = 'auto'; });
-  let max = 0;
-  cards.forEach(c=>{ if(c.offsetHeight > max) max = c.offsetHeight; });
-  cards.forEach(c=>{ c.style.height = max + 'px'; });
-}
-let _eqTimer = null;
-window.addEventListener('resize', ()=>{
-  clearTimeout(_eqTimer);
-  _eqTimer = setTimeout(equalizeCardHeights, 150);
-});
-if(document.fonts && document.fonts.ready){
-  document.fonts.ready.then(()=> equalizeCardHeights());
-}
-
-function buildPlainText(){
-  const {weekly, deadlineSoon, data} = LAST;
-  const lines = ['이번 주, 지금 챙겨야 할 프로모션 한눈에', '', `[이번주 업데이트 ${weekly.length}건]`];
-  weekly.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
-  lines.push('', `[종료 임박 ${deadlineSoon.length}건]`);
-  deadlineSoon.forEach(d=>lines.push(`- ${d.media} : ${d.promo} (${periodText(d)})${d.link ? ' '+d.link : ''}`));
-  lines.push('', `전체 대시보드: ${DASHBOARD_URL}`);
-  return lines.join('\n');
 }
 
 document.getElementById('copySubject').addEventListener('click', async ()=>{
