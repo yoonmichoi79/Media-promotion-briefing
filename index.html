@@ -173,7 +173,7 @@
         <span id="quarterLabel">2026 연간 · 업데이트 2026.10</span>
       </div>
       <h1>플레이디 주요 매체 프로모션 현황</h1>
-      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분됩니다.</p>
+      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분됩니다.<br>별도 프로모션 기간이 불확실하거나, 선착순 프로모션은 매체를 통해 현재 운영 여부 확인 후 참여바랍니다.</p>
       <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며,<br>목록에 없는 프로모션을 알고 계시면 미디어전략실(데전팀 or 미전팀)으로 공유 부탁드립니다.</p>
     </div>
     <div class="source-panel">
@@ -212,7 +212,7 @@
         <button data-v="agency">에이전시 대상</button>
       </div>
       <select class="sortsel" id="sortSel">
-        <option value="group">기본순 (매체군별 그룹)</option>
+        <option value="default">기본순 (신규·변경 → 잔여기간 짧은 순)</option>
         <option value="deadline">종료 임박순</option>
         <option value="updated">최근 업데이트순</option>
       </select>
@@ -310,6 +310,8 @@ const STATUS_COLOR = {'진행중':'green','진행예정':'blue','종료':'gray'}
 /* ---------------- 연간 구조: 1개 누적 시트 → 분기별 탭 ----------------
    분기 구분 규칙: 시작일이 있으면 시작일의 월, 시작일이 없으면 업데이트일의 월 기준 (1~3월=1분기 … 10~12월=4분기).
    둘 다 날짜로 읽을 수 없으면 '미분류'로 따로 모읍니다. 시트에 연도 열이 없어 모든 날짜를 2026년으로 간주합니다. */
+const BASE_YEAR = 2026;                               // 이 페이지가 다루는 연도 (시트 날짜에 연도가 없으면 이 해로 간주)
+const TODAY = (()=>{ const t = new Date(); t.setHours(0,0,0,0); return t; })();
 const SHEET_ID = '1V-wd7NNLI_5gF_HFeBqdxUb73CG0VAsSU20ORSqc8sY';
 const SHEET_GID = '150378453';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
@@ -317,45 +319,80 @@ const QUARTERS = [
   {q:1, label:'1분기'}, {q:2, label:'2분기'}, {q:3, label:'3분기'}, {q:4, label:'4분기'},
 ];
 function currentQuarter(){ return Math.floor(new Date().getMonth()/3) + 1; }
+/* 전년도 판별 (시트 날짜에 연도가 없으므로):
+   ① 날짜에 연도가 적혀 있으면 그 연도  ② 시작일이 아직 오지 않은 날짜인데 상태가 '진행예정'이 아니면 전년도에 시작한 건
+   ③ 시작일이 없을 때 업데이트일이 오늘보다 미래 날짜면(업데이트일은 미래일 수 없음) 전년도 */
+function resolveYear(d){
+  const s = parseMD(d.start), u = parseMD(d.updated);
+  if(s){
+    if(s.year) return s.year;
+    return (new Date(BASE_YEAR, s.month-1, s.day) > TODAY && d.status !== '진행예정') ? BASE_YEAR - 1 : BASE_YEAR;
+  }
+  if(u){
+    if(u.year) return u.year;
+    return new Date(BASE_YEAR, u.month-1, u.day) > TODAY ? BASE_YEAR - 1 : BASE_YEAR;
+  }
+  return BASE_YEAR;
+}
 function quarterOf(d){
   const m = parseMD(d.start) || parseMD(d.updated);
   return m ? Math.ceil(m.month/3) : 0;
 }
 
-const QDATA = {0:[], 1:[], 2:[], 3:[], 4:[]};
-const QSTATUS = {0:'loading', 1:'loading', 2:'loading', 3:'loading', 4:'loading'};   // loading | ok | error | fallback | stale
+const QDATA = {0:[], 1:[], 2:[], 3:[], 4:[], prev:[]};
+const QSTATUS = {0:'loading', 1:'loading', 2:'loading', 3:'loading', 4:'loading', prev:'loading'};   // loading | ok | error | fallback | stale
 let SHEET_LIVE = false, SHEET_ERR = '';
 function setStatus(v){ Object.keys(QSTATUS).forEach(k=>{ QSTATUS[k] = v; }); }
 function distribute(rows){
-  [0,1,2,3,4].forEach(k=>{ QDATA[k] = []; });
-  rows.forEach(d=>{ d.q = quarterOf(d); QDATA[d.q].push(d); });
+  [0,1,2,3,4,'prev'].forEach(k=>{ QDATA[k] = []; });
+  rows.forEach(d=>{ d.y = resolveYear(d); d.q = quarterOf(d); (d.y < BASE_YEAR ? QDATA.prev : QDATA[d.q]).push(d); });
 }
 distribute(DEFAULT_DATA.slice());                // 내장 기본 데이터도 같은 규칙으로 분류
 let DATA = [];
 function rebuild(){ DATA = [].concat(QDATA[1], QDATA[2], QDATA[3], QDATA[4], QDATA[0]); }
 rebuild();
-let state = {tab:'active', quarter:'all', seg:'all', aud:'all', type:'all', q:'', sort:'group'};
-function view(){ return state.quarter==='all' ? DATA : DATA.filter(d=>d.q===state.quarter); }
-function scopeLabel(){ return state.quarter==='all' ? '2026 연간 전체' : (state.quarter===0 ? '미분류' : `${state.quarter}분기`); }
+let state = {tab:'active', quarter:'all', seg:'all', aud:'all', type:'all', q:'', sort:'default'};
+function view(){
+  if(state.quarter==='all') return DATA;                 // 올해(BASE_YEAR) 시작분
+  if(state.quarter==='prev') return QDATA.prev;          // 전년도 시작분
+  return DATA.filter(d=>d.q===state.quarter);
+}
+function scopeLabel(){
+  if(state.quarter==='all') return `${BASE_YEAR} 연간 전체`;
+  if(state.quarter==='prev') return `전년도(${BASE_YEAR-1}) 시작`;
+  return state.quarter===0 ? '미분류' : `${state.quarter}분기`;
+}
 
 /* ---------------- date helpers ---------------- */
 function parseMD(text){
   if(!text) return null;
-  const m = /(\d{1,2})\/(\d{1,2})/.exec(text);
+  const t = text.toString();
+  // 연도가 명시된 형식: 25.12.1 / 2025-12-01 / 25년 12월 1일
+  let m = /(\d{4}|\d{2})\s*[.\-\/년]\s*(\d{1,2})\s*[.\-\/월]\s*(\d{1,2})/.exec(t);
+  if(m){ let y = +m[1]; if(y < 100) y += 2000; return {year:y, month:+m[2], day:+m[3]}; }
+  m = /(\d{1,2})\/(\d{1,2})/.exec(t);
   if(!m) return null;
   return {month:+m[1], day:+m[2]};
 }
+/* d.y = 프로모션의 기준 연도(시작일, 없으면 업데이트일이 속한 해). resolveYear()가 행마다 정해 줍니다. */
 function computeDates(d){
-  const startMD = parseMD(d.start);
-  const endMD = parseMD(d.end);
-  const startDate = startMD ? new Date(2026, startMD.month-1, startMD.day) : null;
+  const yr = d.y || BASE_YEAR;
+  const startMD = parseMD(d.start), endMD = parseMD(d.end), updMD = parseMD(d.updated);
+  const startDate = startMD ? new Date(startMD.year || yr, startMD.month-1, startMD.day) : null;
+  let anchor = startDate;
+  if(!anchor && updMD) anchor = new Date(updMD.year || yr, updMD.month-1, updMD.day);
   let endDate = null;
   if(endMD){
-    endDate = new Date(2026, endMD.month-1, endMD.day);
-    if(startDate && endDate < startDate) endDate = new Date(2027, endMD.month-1, endMD.day);
+    if(endMD.year){
+      endDate = new Date(endMD.year, endMD.month-1, endMD.day);
+    } else {
+      endDate = new Date(yr, endMD.month-1, endMD.day);
+      // 종료일이 시작일보다 앞서면 해를 넘기는 프로모션(시작일이 없는 전년도 건도 동일)
+      if(anchor && endDate < anchor && (startDate || yr < BASE_YEAR)) endDate = new Date(yr+1, endMD.month-1, endMD.day);
+    }
   }
   const dlMD = parseMD(d.deadline);
-  const deadlineDate = dlMD ? new Date(2026, dlMD.month-1, dlMD.day) : null;
+  const deadlineDate = dlMD ? new Date(dlMD.year || yr, dlMD.month-1, dlMD.day) : null;
   return {startDate, endDate, deadlineDate};
 }
 /* 상태 자동 보정: 시트의 원본 상태값과 무관하게, 오늘 날짜가 종료일을 지났으면 '종료',
@@ -373,9 +410,29 @@ function sortKey(d){
   const tier = effStatus(d) === '종료' ? 2 : (effective ? 0 : 1);
   return tier*1e15 + (effective ? effective.getTime() : Number.MAX_SAFE_INTEGER/2);
 }
-function updatedKey(d){
+function updatedTs(d){
   const md = parseMD(d.updated);
-  return md ? -(new Date(2026, md.month-1, md.day).getTime()) : 0;
+  if(!md) return 0;
+  let y = md.year;
+  if(!y){ y = BASE_YEAR; if(new Date(BASE_YEAR, md.month-1, md.day) > TODAY) y = BASE_YEAR - 1; }   // 오늘보다 미래의 업데이트일은 전년도
+  return new Date(y, md.month-1, md.day).getTime();
+}
+function updatedKey(d){ return -updatedTs(d); }
+/* 기본 정렬: ① 종료되지 않은 건 먼저 → ② NEW/UPDATE 먼저 → ③ 잔여기간(마감일 또는 종료일까지) 짧은 순
+   → ④ 기간 미정은 맨 뒤 → ⑤ 같으면 NEW가 UPDATE보다 먼저, 최근 업데이트 순. 종료 건은 최근 종료 순. */
+function defaultSortKey(d){
+  const {endDate, deadlineDate} = computeDates(d);
+  const eff = deadlineDate || endDate;
+  const tagged = (d.tag==='new' || d.tag==='update') ? 0 : 1;
+  const newFirst = d.tag==='new' ? 0 : 1;
+  if(effStatus(d) === '종료') return [1, 0, eff ? -eff.getTime() : 0, newFirst, updatedKey(d)];
+  const remain = eff ? Math.ceil((eff - TODAY) / 86400000) : Infinity;
+  return [0, tagged, remain, newFirst, updatedKey(d)];
+}
+function cmpDefault(a, b){
+  const ka = defaultSortKey(a), kb = defaultSortKey(b);
+  for(let i=0;i<ka.length;i++){ if(ka[i] !== kb[i]) return ka[i] < kb[i] ? -1 : 1; }
+  return 0;
 }
 function ddayLabel(d){
   if(effStatus(d) === '종료') return null;
@@ -513,7 +570,7 @@ function rowHtml(d){
     <tr class="${st==='종료'?'ended':''}">
       <td class="col-media" style="border-left:3px solid var(--${typeColor}-soft);">
         <div class="flagwrap">
-          ${state.quarter==='all' ? `<span class="qbadge">${d.q ? d.q+'Q' : '미분류'}</span>` : ''}
+          ${(state.quarter==='all' || state.quarter==='prev') ? `<span class="qbadge">${d.y < BASE_YEAR ? d.y+'년' : (d.q ? d.q+'Q' : '미분류')}</span>` : ''}
           ${d.tag ? `<span class="flag ${d.tag}">${d.tag==='new'?'NEW':'UPD'}</span>` : ''}
           ${dday ? `<span class="dday">${dday}</span>` : ''}
           ${escapeHtml(d.media)}
@@ -554,7 +611,9 @@ function renderResults(){
     const audOrder = state.aud==='all' ? ['adv','agency'] : [state.aud];
     audOrder.forEach(aud=>{
       let rows = filtered.filter(d=>d.seg===seg && d.aud===aud);
-      if(state.sort === 'deadline'){
+      if(state.sort === 'default'){
+        rows = rows.slice().sort(cmpDefault);
+      } else if(state.sort === 'deadline'){
         rows = rows.slice().sort((a,b)=>sortKey(a)-sortKey(b));
       } else if(state.sort === 'updated'){
         rows = rows.slice().sort((a,b)=>updatedKey(a)-updatedKey(b));
@@ -581,10 +640,10 @@ function renderQTabs(){
     return `<button class="q-tab ${String(state.quarter)===String(key)?'active':''}" data-q="${key}">${label}<span class="n">${cnt}</span>${Q_MARK[st]||''}</button>`;
   };
   const el = document.getElementById('qTabs');
-  const tabsList = QUARTERS.concat(QDATA[0].length ? [{q:0, label:'미분류'}] : []);
+  const tabsList = QUARTERS.concat(QDATA[0].length ? [{q:0, label:'미분류'}] : []).concat(QDATA.prev.length ? [{q:'prev', label:`전년도(${BASE_YEAR-1}) 시작`}] : []);
   el.innerHTML = mk('all','연간 전체') + tabsList.map(x=>mk(x.q, x.label)).join('');
   el.querySelectorAll('.q-tab').forEach(b=>b.addEventListener('click', ()=>{
-    state.quarter = b.dataset.q==='all' ? 'all' : +b.dataset.q;
+    state.quarter = (b.dataset.q==='all' || b.dataset.q==='prev') ? b.dataset.q : +b.dataset.q;
     state.type = 'all';
     refreshAll();
   }));
@@ -611,11 +670,11 @@ function updateSourceUI(lastSync){
   const dot = document.getElementById('srcDot');
   const label = document.getElementById('srcLabel');
   const st = QSTATUS[1];
-  if(st === 'ok'){ dot.className = 'dot on'; dot.style.background = ''; label.textContent = `구글시트 연동됨 · 누적 시트 ${DATA.length}건`; }
+  if(st === 'ok'){ dot.className = 'dot on'; dot.style.background = ''; label.textContent = `구글시트 연동됨 · 누적 시트 ${DATA.length + QDATA.prev.length}건`; }
   else if(st === 'loading'){ dot.className = 'dot off'; dot.style.background = ''; label.textContent = '시트 불러오는 중…'; }
   else if(st === 'stale'){ dot.className = 'dot on'; dot.style.background = '#C9A227'; label.textContent = '동기화 실패 · 이전에 불러온 데이터 표시 중'; }
   else { dot.className = 'dot off'; dot.style.background = '#D9542F'; label.textContent = '연동 실패 · 기본 데이터 표시 중'; }
-  const per = QUARTERS.map(x=>`${x.label} ${QDATA[x.q].length}`).join(' · ') + (QDATA[0].length ? ` · 미분류 ${QDATA[0].length}` : '');
+  const per = QUARTERS.map(x=>`${x.label} ${QDATA[x.q].length}`).join(' · ') + (QDATA[0].length ? ` · 미분류 ${QDATA[0].length}` : '') + (QDATA.prev.length ? ` · 전년도 ${QDATA.prev.length}` : '');
   document.getElementById('srcMeta').textContent = per + (lastSync ? ` · 마지막 동기화 ${lastSync}` : '');
 }
 
