@@ -196,19 +196,62 @@ function rowsFromCsv(csvText){
   return rowsFromSectionedCsv(csvText);
 }
 
+/* ---- 날짜 해석: 시트에 연도가 포함된 다양한 표기를 모두 인식 ----
+   지원: 2026-09-28 / 2026.9.28 / 2026. 9. 28 / 2026/9/28 / 9/28/2026 / 26.9.28 / 26/9/28 / 2026년 9월 28일 / 9월 28일 / 9/28(연도 없음) */
+const DATE_PATTERNS = [
+  {re:/(\d{2,4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일?/g, f:(m)=>({y:m[1], mo:m[2], d:m[3]})},
+  {re:/(\d{4})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})/g, f:(m)=>({y:m[1], mo:m[2], d:m[3]})},
+  {re:/(\d{1,2})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{4})/g, f:(m)=>({y:m[3], mo:m[1], d:m[2]})},
+  {re:/(\d{2})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})/g, f:(m)=> (+m[1] >= 20 ? {y:m[1], mo:m[2], d:m[3]} : {y:m[3], mo:m[1], d:m[2]})},
+  {re:/(\d{1,2})\s*월\s*(\d{1,2})\s*일/g, f:(m)=>({mo:m[1], d:m[2]})},
+  {re:/(\d{1,2})\s*\/\s*(\d{1,2})/g, f:(m)=>({mo:m[1], d:m[2]})},
+];
 function parseMD(text){
   if(!text) return null;
-  const m = /(\d{1,2})\/(\d{1,2})/.exec(text);
-  if(!m) return null;
-  return {month:+m[1], day:+m[2]};
+  const t = text.toString();
+  for(const p of DATE_PATTERNS){
+    p.re.lastIndex = 0;
+    let m;
+    while((m = p.re.exec(t))){
+      const r = p.f(m);
+      const mo = +r.mo, dd = +r.d;
+      if(mo < 1 || mo > 12 || dd < 1 || dd > 31) continue;
+      if(r.y == null) return {month:mo, day:dd};
+      let y = +r.y; if(y < 100) y += 2000;
+      return {year:y, month:mo, day:dd};
+    }
+  }
+  return null;
+}
+/* 화면 표시용: 문장 속 날짜를 연도 없이 M/D 로 바꿔 보여줍니다 (예: 2026-09-28 → 9/28). 날짜가 아닌 문구는 그대로 둡니다. */
+function fmtDateText(text){
+  let t = (text == null ? '' : String(text));
+  for(const p of DATE_PATTERNS){
+    p.re.lastIndex = 0;
+    t = t.replace(p.re, (...a)=>{
+      const m = a.slice(0, -2);
+      const r = p.f(m);
+      const mo = +r.mo, dd = +r.d;
+      if(mo < 1 || mo > 12 || dd < 1 || dd > 31) return m[0];
+      return `${mo}/${dd}`;
+    });
+  }
+  return t;
 }
 function computeDates(d){
-  const s = parseMD(d.start), e = parseMD(d.end);
-  const startDate = s ? new Date(2026, s.month-1, s.day) : null;
+  const s = parseMD(d.start), e = parseMD(d.end), u = parseMD(d.updated);
+  const yr = (s && s.year) || (u && u.year) || 2026;      // 시트에 연도가 있으면 그 연도, 없으면 2026
+  const startDate = s ? new Date(s.year || yr, s.month-1, s.day) : null;
   let endDate = null;
-  if(e){ endDate = new Date(2026, e.month-1, e.day); if(startDate && endDate < startDate) endDate = new Date(2027, e.month-1, e.day); }
+  if(e){
+    if(e.year) endDate = new Date(e.year, e.month-1, e.day);
+    else {
+      endDate = new Date(yr, e.month-1, e.day);
+      if(startDate && endDate < startDate) endDate = new Date(yr+1, e.month-1, e.day);
+    }
+  }
   const dl = parseMD(d.deadline);
-  const deadlineDate = dl ? new Date(2026, dl.month-1, dl.day) : null;
+  const deadlineDate = dl ? new Date(dl.year || yr, dl.month-1, dl.day) : null;
   return {startDate, endDate, deadlineDate};
 }
 function effStatus(d){
