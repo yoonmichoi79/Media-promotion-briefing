@@ -29,13 +29,13 @@
   .wrap{max-width:1220px;margin:0 auto;padding:0 28px 80px;}
 
   /* Masthead */
-  .masthead{border-bottom:2px solid var(--ink);padding:40px 0 20px;margin-bottom:20px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .masthead{border-bottom:2px solid var(--ink);padding:22px 0 12px;margin-bottom:10px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;}
   .masthead-main{flex:1;min-width:280px;}
   .masthead-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink-faint);margin-bottom:14px;gap:12px;}
-  .masthead h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 10px;letter-spacing:-.01em;}
-  .masthead p.sub{font-size:13.5px;color:var(--ink-soft);margin:0;max-width:760px;}
+  .masthead h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 6px;letter-spacing:-.01em;}
+  .masthead p.sub{font-size:13.5px;color:var(--ink-soft);margin:0;max-width:860px;}
   .masthead p.warn{font-size:12px;font-weight:700;color:#C2410C;background:#FFF3E8;border-left:3px solid #E8590C;padding:5px 10px;border-radius:3px;display:inline-block;margin:8px 0 0;white-space:nowrap;}
-  .masthead .note{margin-top:14px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
+  .masthead .note{margin-top:8px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
 
   .source-panel{flex:0 0 260px;background:#EDEEEC;border:1px solid var(--line);border-radius:8px;padding:16px;font-size:12.5px;align-self:flex-start;}
   .source-panel .row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
@@ -50,22 +50,22 @@
   .btn:disabled{opacity:.5;cursor:default;}
 
   /* Sheet-style tabs */
-  .sheet-tabs{display:flex;gap:3px;margin-bottom:22px;border-bottom:2px solid var(--ink);}
-  .sheet-tab{padding:10px 22px;background:var(--line-soft);border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;cursor:pointer;font-size:13.5px;color:var(--ink-soft);font-weight:600;position:relative;top:1px;}
+  .sheet-tabs{display:flex;gap:3px;margin-bottom:10px;border-bottom:2px solid var(--ink);}
+  .sheet-tab{padding:6px 18px;background:var(--line-soft);border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;cursor:pointer;font-size:13.5px;color:var(--ink-soft);font-weight:600;position:relative;top:1px;}
   .sheet-tab .n{font-weight:400;color:var(--ink-faint);margin-left:4px;}
   .sheet-tab.active{background:var(--paper-raised);color:var(--ink);border-color:var(--ink);border-bottom:1px solid var(--paper-raised);}
   .sheet-tab.active.tab-ended{color:var(--gray);}
   .sheet-tab.active.tab-active{color:var(--green);}
 
   /* Stat bar */
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:32px;}
-  .stat{background:var(--paper-raised);padding:14px 16px;}
-  .stat .num{font-family:var(--serif);font-size:24px;font-weight:600;}
-  .stat .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:12px;}
+  .stat{background:var(--paper-raised);padding:6px 14px;display:flex;align-items:baseline;gap:8px;}
+  .stat .num{font-family:var(--serif);font-size:18px;font-weight:600;}
+  .stat .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:0;}
 
   /* Quarter (sheet-style) tabs */
-  .q-tabs{display:flex;gap:4px;align-items:flex-end;border-bottom:2px solid var(--ink);margin:0 0 22px;overflow-x:auto;}
-  .q-tab{font-family:var(--sans);font-size:14px;font-weight:700;padding:10px 20px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:#ECEDE9;color:var(--ink-soft);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;position:relative;top:2px;}
+  .q-tabs{display:flex;gap:4px;align-items:flex-end;border-bottom:2px solid var(--ink);margin:0 0 8px;overflow-x:auto;}
+  .q-tab{font-family:var(--sans);font-size:14px;font-weight:700;padding:7px 16px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:#ECEDE9;color:var(--ink-soft);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;position:relative;top:2px;}
   .q-tab:hover{background:#fff;color:var(--ink);}
   .q-tab.lv-all{background:#6B768C;color:#fff;border-color:#6B768C;}
   .q-tab.lv-mid{background:#BCC4D3;color:var(--ink);border-color:#AEB7C8;}
@@ -78,19 +78,21 @@
   @media(max-width:640px){ .q-tab{padding:9px 13px;font-size:13px;} }
 
   /* Priority strip */
-  .priority{margin-bottom:40px;}
-  .priority h2{font-family:var(--serif);font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 14px;}
+  .priority{margin-bottom:14px;}
+  .priority h2{font-family:var(--serif);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 8px;}
   .priority h2::before{content:"";width:7px;height:7px;background:var(--signal);border-radius:50%;display:inline-block;}
-  .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
-  .pcard{flex:0 0 260px;background:var(--signal-soft);border:1px solid #F0CFC2;padding:14px 16px;border-radius:6px;}
+  .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;}
+  .pcard{flex:0 0 250px;background:var(--signal-soft);border:1px solid #F0CFC2;padding:8px 12px;border-radius:6px;}
   .pcard.new{background:#FFF8D6;border-color:#EBDD94;border-left:4px solid var(--signal);}
   .pcard.update{background:#E6F4E4;border-color:#B5DAB1;border-left:4px solid #2E7D32;}
-  .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
+  .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:6px;}
   .pcard .media{font-weight:700;font-size:14px;}
-  .pcard .promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pcard .promo{font-size:12px;color:var(--ink-soft);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .pcard.urgent{background:#FDECEC;border-color:#F1B8B8;border-left:4px solid #C62828;}
   .pcard .dd{font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C62828;color:#fff;white-space:nowrap;}
   .priority.urgent-block h2::before{background:#C62828;}
+  .pcard .pfoot{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;}
+  .pcard .pfoot .linkbtn{padding:2px 8px;font-size:11px;}
   .pcard .period{font-size:11.5px;color:var(--ink-faint);}
 
   /* Controls */
@@ -599,8 +601,7 @@ function renderPriority(){
         <span class="flag ${d.tag}" style="background:${d.tag==='new' ? 'var(--signal)' : '#2E7D32'};color:#fff;">${d.tag==='new'?'NEW':'UPDATE'}</span>
       </div>
       <div class="promo">${highlightBrackets(escapeHtml(d.promo))}</div>
-      <div class="period">${periodDisplay(d)}</div>
-      <div style="margin-top:8px;">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
+      <div class="pfoot"><div class="period">${periodDisplay(d)}</div>${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
     </div>
   `;
   }).join('');
@@ -619,8 +620,7 @@ function renderUrgent(){
         <span class="dd">${ddayLabel(d)}</span>
       </div>
       <div class="promo">${highlightBrackets(escapeHtml(d.promo))}</div>
-      <div class="period">${periodDisplay(d)}</div>
-      <div style="margin-top:8px;">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
+      <div class="pfoot"><div class="period">${periodDisplay(d)}</div>${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
     </div>`).join('');
 }
 function cmpDefaultRemain(a,b){
