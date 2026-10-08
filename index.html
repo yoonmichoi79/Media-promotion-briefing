@@ -80,6 +80,8 @@
   .priority h2::before{content:"";width:7px;height:7px;background:var(--signal);border-radius:50%;display:inline-block;}
   .priority-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
   .pcard{flex:0 0 260px;background:var(--signal-soft);border:1px solid #F0CFC2;padding:14px 16px;border-radius:6px;}
+  .pcard.new{background:var(--signal-soft);border-color:#F0CFC2;border-left:4px solid var(--signal);}
+  .pcard.update{background:#FBF4D6;border-color:#E6D68F;border-left:4px solid var(--gold);}
   .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
   .pcard .media{font-weight:700;font-size:14px;}
   .pcard .promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
@@ -579,7 +581,7 @@ function renderPriority(){
   block.style.display='';
   scroll.innerHTML = items.map(d=>{
     return `
-    <div class="pcard">
+    <div class="pcard ${d.tag}">
       <div class="pcard-top">
         <span class="media">${escapeHtml(d.media)}</span>
         <span class="flag ${d.tag}" style="background:${d.tag==='new' ? 'var(--signal)' : 'var(--gold)'};color:#fff;">${d.tag==='new'?'NEW':'UPDATE'}</span>
