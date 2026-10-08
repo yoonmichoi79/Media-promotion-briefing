@@ -33,7 +33,7 @@
   .masthead-main{flex:1;min-width:280px;}
   .masthead-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink-faint);margin-bottom:14px;gap:12px;}
   .masthead h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 10px;letter-spacing:-.01em;}
-  .masthead p.sub{font-size:14.5px;color:var(--ink-soft);margin:0;max-width:640px;}
+  .masthead p.sub{font-size:13.5px;color:var(--ink-soft);margin:0;max-width:760px;}
   .masthead p.warn{font-size:12px;font-weight:700;color:#C2410C;background:#FFF3E8;border-left:3px solid #E8590C;padding:5px 10px;border-radius:3px;display:inline-block;margin:8px 0 0;white-space:nowrap;}
   .masthead .note{margin-top:14px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
 
@@ -67,6 +67,9 @@
   .q-tabs{display:flex;gap:4px;align-items:flex-end;border-bottom:2px solid var(--ink);margin:0 0 22px;overflow-x:auto;}
   .q-tab{font-family:var(--sans);font-size:14px;font-weight:700;padding:10px 20px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:#ECEDE9;color:var(--ink-soft);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;position:relative;top:2px;}
   .q-tab:hover{background:#fff;color:var(--ink);}
+  .q-tab.lv-all{background:#6B768C;color:#fff;border-color:#6B768C;}
+  .q-tab.lv-mid{background:#BCC4D3;color:var(--ink);border-color:#AEB7C8;}
+  .q-tab.lv-all:hover,.q-tab.lv-mid:hover{background:#fff;color:var(--ink);}
   .q-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
   .q-tab .n{font-size:11px;font-weight:600;padding:1px 7px;border-radius:9px;background:rgba(22,29,43,.1);}
   .q-tab.active .n{background:rgba(255,255,255,.2);}
@@ -85,6 +88,9 @@
   .pcard .pcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
   .pcard .media{font-weight:700;font-size:14px;}
   .pcard .promo{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pcard.urgent{background:#FDECEC;border-color:#F1B8B8;border-left:4px solid #C62828;}
+  .pcard .dd{font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C62828;color:#fff;white-space:nowrap;}
+  .priority.urgent-block h2::before{background:#C62828;}
   .pcard .period{font-size:11.5px;color:var(--ink-faint);}
 
   /* Controls */
@@ -177,7 +183,7 @@
         <span id="quarterLabel">2026 연간 · 업데이트 2026.10</span>
       </div>
       <h1>플레이디 주요 매체 프로모션 현황</h1>
-      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>전체 탭은 원본 시트의 모든 프로모션(기본: 진행중·예정)을, 연간 전체는 올해 시작분을 보여줍니다. 분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분되며, 전년도에 시작한 진행중 프로모션도 전체 탭에 표시됩니다.</p>
+      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>전체 탭은 원본 시트의 모든 프로모션(기본: 진행중·예정)을, 연간 전체는 올해 시작분을 보여줍니다. <br>분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분되며, 전년도에 시작한 진행중 프로모션도 전체 탭에 표시됩니다.</p>
       <p class="warn">※ 프로모션 기간이 불확실하거나 선착순 프로모션은 매체에 운영 여부 확인 후 참여 부탁드립니다.</p>
       <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며,<br>목록에 없는 프로모션을 알고 계시면 미디어전략실(데전팀 or 미전팀)으로 공유 부탁드립니다.</p>
     </div>
@@ -202,6 +208,11 @@
   <div class="priority" id="priorityBlock">
     <h2>이번 업데이트 신규 · 변경 프로모션</h2>
     <div class="priority-scroll" id="priorityScroll"></div>
+  </div>
+
+  <div class="priority urgent-block" id="urgentBlock" style="display:none">
+    <h2>종료 임박 프로모션</h2>
+    <div class="priority-scroll" id="urgentScroll"></div>
   </div>
 
   <div class="controls">
@@ -574,7 +585,8 @@ function renderStats(){
 }
 
 function renderPriority(){
-  const items = view().filter(d=>d.tag==='new'||d.tag==='update');
+  const items = view().filter(d=>d.tag==='new'||d.tag==='update')
+    .sort((a,b)=> (updatedTs(b)-updatedTs(a)) || ((a.tag==='new'?0:1)-(b.tag==='new'?0:1)));   // 최근 업데이트 날짜순
   const block = document.getElementById('priorityBlock');
   const scroll = document.getElementById('priorityScroll');
   if(items.length===0){ block.style.display='none'; return; }
@@ -592,6 +604,28 @@ function renderPriority(){
     </div>
   `;
   }).join('');
+}
+
+function renderUrgent(){
+  const block = document.getElementById('urgentBlock');
+  const scroll = document.getElementById('urgentScroll');
+  const items = view().filter(d=>ddayLabel(d)).sort(cmpDefaultRemain);
+  if(items.length===0){ block.style.display='none'; return; }
+  block.style.display='';
+  scroll.innerHTML = items.map(d=>`
+    <div class="pcard urgent">
+      <div class="pcard-top">
+        <span class="media">${escapeHtml(d.media)}</span>
+        <span class="dd">${ddayLabel(d)}</span>
+      </div>
+      <div class="promo">${highlightBrackets(escapeHtml(d.promo))}</div>
+      <div class="period">${periodDisplay(d)}</div>
+      <div style="margin-top:8px;">${d.link ? `<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="linkbtn" title="공지 바로가기">링크</a>` : '<span class="linkbtn-empty">–</span>'}</div>
+    </div>`).join('');
+}
+function cmpDefaultRemain(a,b){
+  const f = d=>{ const c=computeDates(d); const e=c.deadlineDate||c.endDate; return e ? e.getTime() : Infinity; };
+  return f(a)-f(b);
 }
 
 function renderChips(){
@@ -704,7 +738,8 @@ function renderQTabs(){
     const n = key==='sheet' ? allScope().length : key==='all' ? DATA.length : QDATA[key].length;
     const st = QSTATUS[(key==='all'||key==='sheet') ? 1 : key];
     const cnt = (st==='loading' && !n) ? '–' : n;
-    return `<button class="q-tab ${String(state.quarter)===String(key)?'active':''}" data-q="${key}">${label}<span class="n">${cnt}</span>${Q_MARK[st]||''}</button>`;
+    const lv = key==='sheet' ? 'lv-all' : (key==='all' || key==='prev') ? 'lv-mid' : '';
+    return `<button class="q-tab ${lv} ${String(state.quarter)===String(key)?'active':''}" data-q="${key}">${label}<span class="n">${cnt}</span>${Q_MARK[st]||''}</button>`;
   };
   const el = document.getElementById('qTabs');
   const tabsList = QUARTERS.concat(QDATA[0].length ? [{q:0, label:'미분류'}] : []).concat(QDATA.prev.length ? [{q:'prev', label:`전년도(${BASE_YEAR-1}) 시작`}] : []).concat(QDATA.next.length ? [{q:'next', label:`내년(${BASE_YEAR+1}) 시작`}] : []);
@@ -715,7 +750,7 @@ function renderQTabs(){
     refreshAll();
   }));
 }
-function refreshAll(){ renderQTabs(); renderStats(); renderPriority(); renderAll(); }
+function refreshAll(){ renderQTabs(); renderStats(); renderPriority(); renderUrgent(); renderAll(); }
 
 document.getElementById('segMedia').addEventListener('click', e=>{
   if(e.target.tagName!=='BUTTON') return;
