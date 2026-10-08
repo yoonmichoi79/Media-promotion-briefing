@@ -34,7 +34,7 @@
   .masthead-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink-faint);margin-bottom:14px;gap:12px;}
   .masthead h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 10px;letter-spacing:-.01em;}
   .masthead p.sub{font-size:14.5px;color:var(--ink-soft);margin:0;max-width:640px;}
-  .masthead p.warn{font-size:12px;color:var(--ink-soft);margin:8px 0 0;white-space:nowrap;}
+  .masthead p.warn{font-size:12px;font-weight:700;color:#C2410C;background:#FFF3E8;border-left:3px solid #E8590C;padding:5px 10px;border-radius:3px;display:inline-block;margin:8px 0 0;white-space:nowrap;}
   .masthead .note{margin-top:14px;font-size:12px;color:var(--ink-faint);border-left:2px solid var(--line);padding-left:12px;max-width:600px;}
 
   .source-panel{flex:0 0 260px;background:#EDEEEC;border:1px solid var(--line);border-radius:8px;padding:16px;font-size:12.5px;align-self:flex-start;}
@@ -175,7 +175,7 @@
         <span id="quarterLabel">2026 연간 · 업데이트 2026.10</span>
       </div>
       <h1>플레이디 주요 매체 프로모션 현황</h1>
-      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분되며, 연간 전체에는 전년도에 시작한 진행중 프로모션도 함께 표시됩니다.</p>
+      <p class="sub">2026년 연간 · 빅테크 및 버티컬 매체 프로모션 현황입니다.<br>전체 탭은 원본 시트의 모든 프로모션(기본: 진행중·예정)을, 연간 전체는 올해 시작분을 보여줍니다. 분기 탭으로 분기별 현황을 보고, 진행중/종료 탭과 종료 임박순으로 우선순위를 확인하세요.<br>분기는 시작일 기준(시작일이 없으면 업데이트일 기준)으로 구분되며, 전년도에 시작한 진행중 프로모션도 전체 탭에 표시됩니다.</p>
       <p class="warn">※ 프로모션 기간이 불확실하거나 선착순 프로모션은 매체에 운영 여부 확인 후 참여 부탁드립니다.</p>
       <p class="note">컨플루언스 게시판 및 각 매체 Worki 공지사항이 최신 기준이며,<br>목록에 없는 프로모션을 알고 계시면 미디어전략실(데전팀 or 미전팀)으로 공유 부탁드립니다.</p>
     </div>
@@ -405,20 +405,21 @@ distribute(DEFAULT_DATA.slice());                // 내장 기본 데이터도 �
 let DATA = [];
 function rebuild(){ DATA = [].concat(QDATA[1], QDATA[2], QDATA[3], QDATA[4], QDATA[0]); }
 rebuild();
-let state = {tab:'active', quarter:'all', seg:'all', aud:'all', type:'all', q:'', sort:'default'};
+let state = {tab:'active', quarter:'sheet', seg:'all', aud:'all', type:'all', q:'', sort:'default'};
 /* 연간 전체: 올해 시작분 전체 + 시작 연도와 무관하게 아직 종료되지 않은(진행중·진행예정) 전년도/내년 시작분.
    종료된 전년도 건은 '전년도' 탭에서만 보입니다. */
 function allScope(){
-  const alive = (d)=> effStatus(d) !== '종료';
-  return DATA.concat(QDATA.prev.filter(alive), QDATA.next.filter(alive));
+  return DATA.concat(QDATA.prev, QDATA.next);   // 원본 시트 전체 (연도·분기·종료 여부 무관)
 }
 function view(){
-  if(state.quarter==='all') return allScope();
+  if(state.quarter==='sheet') return allScope();       // 원본 시트 전체
+  if(state.quarter==='all') return DATA;               // 올해(2026) 시작분 전체
   if(state.quarter==='prev') return QDATA.prev;          // 전년도 시작분
   if(state.quarter==='next') return QDATA.next;          // 다음연도 시작분
   return DATA.filter(d=>d.q===state.quarter);
 }
 function scopeLabel(){
+  if(state.quarter==='sheet') return '전체(원본 시트)';
   if(state.quarter==='all') return `${BASE_YEAR} 연간 전체`;
   if(state.quarter==='prev') return `전년도(${BASE_YEAR-1}) 시작`;
   if(state.quarter==='next') return `내년(${BASE_YEAR+1}) 시작`;
@@ -634,7 +635,7 @@ function rowHtml(d){
     <tr class="${st==='종료'?'ended':''}">
       <td class="col-media" style="border-left:3px solid var(--${typeColor}-soft);">
         <div class="flagwrap">
-          ${(state.quarter==='all' || state.quarter==='prev' || state.quarter==='next') ? `<span class="qbadge">${d.y !== BASE_YEAR ? d.y+'년' : (d.q ? d.q+'Q' : '미분류')}</span>` : ''}
+          ${(state.quarter==='sheet' || state.quarter==='all' || state.quarter==='prev' || state.quarter==='next') ? `<span class="qbadge">${d.y !== BASE_YEAR ? d.y+'년' : (d.q ? d.q+'Q' : '미분류')}</span>` : ''}
           ${d.tag ? `<span class="flag ${d.tag}">${d.tag==='new'?'NEW':'UPD'}</span>` : ''}
           ${dday ? `<span class="dday">${dday}</span>` : ''}
           ${escapeHtml(d.media)}
@@ -654,7 +655,7 @@ function renderResults(){
   const container = document.getElementById('results');
 
   if(filtered.length===0){
-    const qs = state.quarter==='all' ? null : QSTATUS[state.quarter];
+    const qs = (state.quarter==='all'||state.quarter==='sheet') ? null : QSTATUS[state.quarter];
     let msg = '조건에 맞는 프로모션이 없습니다.';
     if(view().length===0){
       if(qs==='loading') msg = `${scopeLabel()} 시트를 불러오는 중입니다…`;
@@ -698,16 +699,16 @@ function renderAll(){ renderTabs(); renderChips(); renderResults(); }
 const Q_MARK = {loading:'<span class="st">…</span>', error:'<span class="st" title="시트를 불러오지 못했습니다">⚠</span>', fallback:'<span class="st" title="시트 연결 실패 · 내장 기본 데이터 표시 중">⚠</span>', stale:'<span class="st" title="최신 동기화 실패 · 이전에 불러온 데이터 표시 중">⚠</span>', ok:''};
 function renderQTabs(){
   const mk = (key, label)=>{
-    const n = key==='all' ? allScope().length : QDATA[key].length;
-    const st = QSTATUS[key==='all' ? 1 : key];
+    const n = key==='sheet' ? allScope().length : key==='all' ? DATA.length : QDATA[key].length;
+    const st = QSTATUS[(key==='all'||key==='sheet') ? 1 : key];
     const cnt = (st==='loading' && !n) ? '–' : n;
     return `<button class="q-tab ${String(state.quarter)===String(key)?'active':''}" data-q="${key}">${label}<span class="n">${cnt}</span>${Q_MARK[st]||''}</button>`;
   };
   const el = document.getElementById('qTabs');
   const tabsList = QUARTERS.concat(QDATA[0].length ? [{q:0, label:'미분류'}] : []).concat(QDATA.prev.length ? [{q:'prev', label:`전년도(${BASE_YEAR-1}) 시작`}] : []).concat(QDATA.next.length ? [{q:'next', label:`내년(${BASE_YEAR+1}) 시작`}] : []);
-  el.innerHTML = mk('all','연간 전체') + tabsList.map(x=>mk(x.q, x.label)).join('');
+  el.innerHTML = mk('sheet','전체') + mk('all',`${BASE_YEAR} 연간 전체`) + tabsList.map(x=>mk(x.q, x.label)).join('');
   el.querySelectorAll('.q-tab').forEach(b=>b.addEventListener('click', ()=>{
-    state.quarter = (b.dataset.q==='all' || b.dataset.q==='prev' || b.dataset.q==='next') ? b.dataset.q : +b.dataset.q;
+    state.quarter = (b.dataset.q==='sheet' || b.dataset.q==='all' || b.dataset.q==='prev' || b.dataset.q==='next') ? b.dataset.q : +b.dataset.q;
     state.type = 'all';
     refreshAll();
   }));
